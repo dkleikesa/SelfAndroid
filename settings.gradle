@@ -1,0 +1,5 @@
+include  /*':annotations', ':JavaRun', ':testjars', ':processors',*/':app', ':ACM'
+//ext{
+//    int a =10;
+//
+//}

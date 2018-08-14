@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ff0"
+    android:orientation="vertical"
+    tools:context="autonavi.jnitest.Main2Activity">
+
+    <autonavi.jnitest.MySurfaceView
+        android:id="@+id/surfaceview"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+    <!--<EditText-->
+    <!--android:id="@+id/surfaceview"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="500dp" />-->
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/surfaceview"
+        android:text="click" />
+
+
+    <ImageView
+    android:id="@+id/imgview1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/btn"
+    android:src="@drawable/week1" />
+
+    <ImageView
+        android:id="@+id/imgview2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn"
+        android:layout_toRightOf="@id/imgview1"
+        android:src="@drawable/week1" />
+
+    <ImageView
+        android:id="@+id/imgview3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn"
+        android:layout_toRightOf="@id/imgview2"
+        android:src="@drawable/week1" />
+
+
+    <ImageView
+        android:id="@+id/imgview4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgview1"
+        android:src="@drawable/week1" />
+
+    <ImageView
+        android:id="@+id/imgview5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgview1"
+        android:layout_toRightOf="@id/imgview4"
+        android:src="@drawable/week1" />
+
+    <ImageView
+        android:id="@+id/imgview6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imgview1"
+        android:layout_toRightOf="@id/imgview5"
+        android:src="@drawable/week1" />
+
+</RelativeLayout>
