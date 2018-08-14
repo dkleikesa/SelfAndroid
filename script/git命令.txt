@@ -1,0 +1,174 @@
+http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000
+1.安装
+  sudo apt-get install git
+
+2.配置本地的用户信息
+  git config --global user.name "Your Name"
+  git config --global user.email "email@example.com"
+
+3.建立本地的版本库
+  版本库又名仓库，这个库里面的所有文件都可以被Git管理起来，每个文件的修改、删除，
+  Git都能跟踪，以便任何时刻都可以追踪历史，或者在将来某个时刻可以“还原”。
+  本地版本库，仅仅用来管理本地的代码，我们把所有的修改都在本地版本库同步好以后，
+  可以提交到公共服务器上，与大家共享。
+  在创建版本库的时候，一定要在你要管理的代码目录下然后执行
+  git init
+
+4.本地版本库中添加要监视的文件
+  将我们做过修改的文件添加到要同步的缓存中，也就是说，如果你在一个文件上做了修改，
+  一定要将这个文件add一下 在调用git commit -m "提交的备注信息"时才会生效
+  git add 文件1 文件2 。。。
+  git add -A  (添加所新文件)
+
+5.本地版本库同步
+  两种方法
+  (1)
+    git add 文件1 文件2 。。。
+    git commit -m "提交的备注信息"
+  (2)
+    git add -A
+    git commit -a -m "提交的备注信息"
+
+6.查看当前代码和本地版本库中代码的差别（仅告诉我们哪个文件做了修改）
+  git status
+
+7.查看当前代码和版本库中代码文件的区别（告诉我们具体文件改了什么内容）
+  git diff 文件1 文件2 。。。（不带参数代表所有文件都列出来）
+  git diff HEAD -- 文件名
+
+8.查看历史版本提交信息
+  git log
+  git log --pretty=oneline （在一行内显示一条）
+
+9.回退到以前版本
+  git reset --hard 版本号 （HEAD当前版本，HEAD^:上个版本，HEAD^^:上上个版本，HEAD~100:上100个版本，或者版本ID的前7位）
+
+10.查看所有分支的所有操作记录，包括已经删除的分支
+  git reflog
+
+11.丢弃工作区的修改，让这个文件回到最近一次git commit或git add时的状态（git add优先）  
+  git checkout -- 文件名  （一定要有 --filename 参数）
+
+12.丢弃缓存区（也就是add以后的区域）的修改
+  git reset HEAD 文件名
+
+13.git中删除要同步的文件
+  git rm 文件名
+
+14.添加远程库
+  git remote add origin git@github.com:michaelliao/learngit.git  
+
+15.把本地库的所有内容推送到远程库上
+  git push -u origin master
+  （使用命令git push -u origin master第一次推送master分支的所有内容，此后，每次本地提交后，就可以使用命令git push origin master推送最新修改）
+  git push origin local_branch:remote_branch 
+  local_branch必须为你本地存在的分支，remote_branch为远程分支，如果remote_branch不存在则会自动创建分支。
+  git push origin :remote_branch  local_branch留空的话则是删除远程remote_branch分支。
+  
+
+16.从远程库克隆
+  git clone git@github.com:michaelliao/gitskills.git
+
+17.创建dev分支，然后切换到dev分支
+   git checkout -b dev
+   相当于下面两条命令
+   git branch dev
+   git checkout dev
+
+18.查看当前分支
+   git branch  查看本地分支
+   git branch -r 查看远程分支
+   git branch -a 查看所有分支
+   
+
+19.把dev分支的工作成果合并到master分支上（先切换到master分区然后再合并）
+   git merge dev
+   注意使用--no-ff参数，git merge --no-ff dev 可以获得比较全面的分支信息
+
+20.看到分支合并图
+   git log --graph --pretty=oneline --abbrev-commit
+
+21.删除feature1分支
+   git branch -d feature1
+
+22.如果要丢弃一个没有被合并过的分支，可以通过git branch -D name强行删除
+
+23.把当前工作现场“储藏”起来
+   git stash
+
+24.git stash list 查看stash列表
+   git stash apply 回复现场
+   git stash drop 删除保持的stash
+   git stash pop 恢复并删除stash，相当于上面两条命令合体
+
+25.查看以前版本的代码
+   git checkout 版本号(HEAD HEAD^)
+
+26.添加标签
+   git tag -a 0.1.1 -m "说明"      	当前版本打标签
+   git tag -a 0.1.1 版本号 -m "说明"	任意版本打标签
+
+27.查看以前版本的 修改内容
+   git show 标签、版本号......
+
+28.代码库建立
+   git --bare init --shared
+
+29.更改最后一个commit版本的备注信息
+   git commit --amend
+
+30.查看git库中文件记录
+  git ls-files
+
+31.查看当前分支的操作记录 ，仅仅列出文件名，不列出详细内容 
+   git whatchanged 
+
+32.删除最新提交的commit但是保留文件更改
+   git reset --mixed 版本号     //退回到 版本号 所在的位置，保留所有文件更改 需要git add 
+   git reset --soft 版本号	//退回到版本号所在的位置，保留所有文件更改，但是不需要git add 直接commit
+
+33.返回到以前的commit重新修改并操作
+   git rebase
+
+34.取回远程主机某个分支的更新，再与本地的指定分支合并
+    git pull <远程主机名> <远程分支名>:<本地分支名>
+   如果远程分支是与当前分支合并，则冒号后面的部分可以省略。
+    git pull <远程主机名> <远程分支名>
+   如果当前分支与远程分支存在追踪关系，git pull就可以省略远程分支名。
+    git pull origin
+	
+
+   git checkout -b dev
+   git branch 
+   git checkout master
+   git merge --no-ff dev
+
+
+
+【生成patch】
+
+分支master 上是没修改前的，分支patch 上是修改以后的打patch的。
+
+1. 先切换到 patch分支
+
+git checkout patch
+
+2. 生成patch
+
+git format-patch -M master
+
+
+会生成一个文件名如：0002-Release-version-1.4.6.patch 的patch文件
+
+
+
+
+【合并patch】
+
+拿到patch以后，
+
+git am 0002-Release-version-1.4.6.patch //打补丁包括了补丁中的commit信息，不用自己提交 自动多一个commit
+git apply 0002-Release-version-1.4.6.patch 	//仅仅是把补丁信息打进去， 需要自己commit
+
+更多 0
+上一篇：Linux 内核编译

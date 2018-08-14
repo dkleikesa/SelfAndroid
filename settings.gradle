@@ -1,5 +1,1 @@
-include  /*':annotations', ':JavaRun', ':testjars', ':processors',*/':app', ':ACM'
-//ext{
-//    int a =10;
-//
-//}
+include  /*':annotation-annotations', ':annotation-processors', ':BYDMonitor', 'testjars',*/':JniTest', ':ACM'

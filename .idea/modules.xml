@@ -5,7 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/ACM/ACM.iml" filepath="$PROJECT_DIR$/ACM/ACM.iml" />
       <module fileurl="file://$PROJECT_DIR$/annotations/AnnotationTest.iml" filepath="$PROJECT_DIR$/annotations/AnnotationTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/JniTest.iml" filepath="$PROJECT_DIR$/JniTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JniTest/JniTest-JniTest.iml" filepath="$PROJECT_DIR$/JniTest/JniTest-JniTest.iml" />
     </modules>
   </component>
 </project>

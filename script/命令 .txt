@@ -1,0 +1,410 @@
+mount -t nfs -o nolock 192.168.0.101:/nfs/root /mnt/disk/nfs/
+mount -t nfs -o nolock 192.168.1.101:/opt/imx6dq/rootfs /system/aa/
+mount -t vmhgfs .host:/ /mnt/hgfs
+mount -t nfs -o nolock 192.168.1.101:/home/xuansongtao/rootfs /home/lijianzhang/nfs
+showmount
+mount -l	//服务器端 看挂载情况
+df -a  		//客户端看挂载情况
+
+printk("lijianzhang---%s video_options %d=%s \n",__FUNCTION__,i,video_options[i]); //lijianzhang
+
+
+wget  //从互联网下载文件
+
+dmesg //显示开机信息
+
+//将system 挂载为可读
+busybox cp eGalax_Touch_Screen.idc  Ft5x0x_Touch_Screen.idc
+ro.sf.lcd_density=240
+
+ifconfig eth0 10.0.0.123
+busybox route add -net 225.0.0.1 netmask 225.0.0.1 dev eth0
+busybox route add default gw "10.0.0.123" dev eth0
+
+busybox ifconfig eth0 10.0.0.123
+mount -o remount /dev/block/mmcblk0p5 /system  
+rm /system/priv-app/Settings.apk
+busybox wget  http://10.0.0.236/Settings.apk -P /system/priv-app/
+chmod 0644 /system/priv-app/Settings.apk
+
+rm /system/lib/libtinyalsa.so
+busybox wget  http://10.0.0.236/libtinyalsa.so -P /system/lib/
+chmod 0644 /system/lib/libtinyalsa.so
+
+
+
+mount -o remount /dev/block/mmcblk0p5 /system  
+rm /system/lib/hw/camera.imx6.so
+busybox ifconfig eth0 10.0.0.123
+busybox wget http://10.0.0.236/camera.imx6.so -P /system/lib/hw/
+chmod 0644 /system/lib/hw/camera.imx6.so
+reboot
+
+
+mount -o remount /dev/block/mmcblk0p5 /system  
+rm /system/lib/libcameraservice.so
+busybox wget http://10.0.0.236/libcameraservice.so -P /system/lib/
+chmod 0644 /system/lib/libcameraservice.so
+
+mount -o remount /dev/block/mmcblk0p5 /system  
+rm /system/lib/libcamera_client.so
+busybox wget http://10.0.0.236/libcamera_client.so -P /system/lib/
+chmod 0644 /system/lib/libcamera_client.so
+
+
+rm /system/lib/hw/hwcomposer.imx6.so 
+
+busybox wget http://192.168.1.215/mxc_v4l2_tvin
+
+busybox cp /sdcard/camera.imx6.so /system/lib/hw/
+
+echo "UYVY">>/sys/devices/platform/gs2971.0/gs2971_format
+echo "GENERIC_16">>/sys/devices/platform/gs2971.0/gs2971_format
+
+./mxc_v4l2_tvin -ol 0 -ot 0 -ow 1280 -oh 720 -if UYVY -of UYVY -self 0
+
+./mxc_v4l2_tvin -ol 0 -ot 0 -ow 320 -oh 320 -if IPU2 -of UYVY -self 0
+
+
+logcat -s audio_hw_primary
+
+logcat -s audio_hw_primary
+
+busybox ifconfig eth0 10.0.0.100
+
+busybox wget http://10.0.0.221/video/test.mp4
+
+busybox tftp -g -r hao.mpg 10.0.0.221
+
+grep -R -w -n "eGalax Touch Screen" ./
+
+alias  agcc='arm-none-linux-gnueabi-gcc'
+export PATH="/home/usr/local/arm/4.3.2/bin/:$PATH"
+
+
+./memtool -32 0x2630008=0216077F
+./memtool -32 0x263000c=00c00014 
+
+tftpboot 0x10800000 z
+bootm 0x10800000
+cd /sys/class/timed_output/vibrator
+echo "300" >>/sys/class/timed_output/vibrator/enable
+
+
+setenv bootargs console=ttymxc0,115200 androidboot.console=ttymxc0 vmalloc=400M init=/init video=mxcfb0:dev=hdmi,1920x1080M@60,bpp=32 video=mxcfb1:off video=mxcfb2:off fbmem=28M androidboot.hardware=freescale
+setenv bootargs console=ttymxc0,115200 androidboot.console=ttymxc0 vmalloc=400M init=/init video=mxcfb0:dev=hdmi,1920x1080M@60 fbmem=28M
+ nfsroot=192.168.1.101:/opt/imx6dq/rootfs ip=192.168.0.104:192.168.1.101:192.168.0.1:255.255.255.0:xst:eth0:off rw 
+
+setenv bootargs console=ttymxc0,115200 init=/init rw androidboot.console=ttymxc0 video=mxcfb0:dev=ldb,LDB-XGA,if=RGB666,bpp=16 video=mxcfb1:dev=hdmi,1920x1080M@60 fbmem=10M,28M video=mxcfb2:off vmalloc=512M 
+setenv bootargs ${bootargs}  nfsroot=192.168.1.101:/opt/imx6dq/rootfs ip=192.168.1.113:192.168.1.101:192.168.1.1:255.255.255.0:xst:eth0:off rw
+setenv bootargs console=ttymxc0,115200 init=/init rw androidboot.console=ttymxc0 video=mxcfb0:dev=ldb,LDB-XGA,if=RGB666,bpp=16 video=mxcfb1:off video=mxcfb2:off vmalloc=400M  fbmem=10M
+set ipaddr 192.168.1.113
+set ethaddr 00:04:0f:03:76:a0
+set gatewayip 192.168.1.1
+set bootdelay 1
+setenv bootargs console=ttymxc0,115200 init=/init rw androidboot.console=ttymxc0 video=mxcfb0:dev=mipi_dsi video=mxcfb1:off video=mxcfb2:off vmalloc=400M  fbmem=10M
+setenv bootargs ${bootargs}  nfsroot=192.168.1.101:/home/lijianzhang/rootfs_2.0 ip=192.168.1.113:192.168.1.101:192.168.1.1:255.255.255.0:xst:eth0:off rw
+save
+setenv bootargs console=ttymxc0,115200 init=/init rw androidboot.console=ttymxc0 video=mxcfb0:dev=ldb,LDB-XGA,if=RGB666,bpp=16 video=mxcfb1:mipi_dsi video=mxcfb2:off vmalloc=512M  fbmem=10M,28M
+   
+setenv bootargs ${bootargs} root=/dev/mmcblk3p2 rw 
+setenv bootargs ${bootargs} androidboot.mode=charger
+
+u-boot>setenv etnaddr 11:22:33:44:55:66 //是设置板子的mac地址。
+u-boot>setenv ipaddr 192.168.1.133	//是设置板子的IP地址。
+u-boot>setenv serverip 192.168.0.55	//是设置提供内核下载的服务器IP地址。
+u-boot>setenv gatewayip 192.168.1.1 	//设置网关
+u-boot>setenv netmask 255.255.255.0 	//设置子网掩码
+setenv name				//删除变量
+u-boot>saveenv
+//飞思卡尔板子 可用tftp  
+bootdelay=3
+baudrate=115200
+serverip=192.168.1.101
+netmask=255.255.255.0
+loadaddr=0x10800000
+rd_loadaddr=0x11000000
+netdev=eth0
+ethprime=FEC0
+fastboot_dev=mmc3
+bootcmd=booti mmc3
+splashimage=0x30000000
+splashpos=m,m
+lvds_num=1
+ethact=FEC0
+set ipaddr 192.168.0.104
+set ethaddr 23:1a:7b:50:a0:00
+set gatewayip 192.168.0.1
+stdin=serial
+stdout=serial
+stderr=serial
+
+
+sudo dd if=~/Tsinghua_env/ltib/rpm/BUILD/u-boot-2009.08/u-boot.bin of=/dev/sdc bs=512 seek=2 skip=2 conv=fsync
+sudo dd if=~/Tsinghua_env/ltib/rpm/BUILD/linux-3.0.35/arch/arm/boot/uImage of=/dev/sdc bs=512 seek=2048 conv=fsync
+sudo fdisk /dev/sdc
+u
+d
+p
+n
+1
+16384
+sudo mkfs.ext3 /dev/sdc1
+tar -zxcv 
+
+
+sudo chmod +x ./prebuilt/linux-x86/fsl/fsl-sdcard-partition.sh
+sudo ./prebuilt/linux-x86/fsl/fsl-sdcard-partition.sh /dev/sdb
+
+sudo dd if=u-boot.bin of=/dev/sdb bs=1K skip=1 seek=1; sync
+sudo dd if=boot.img of=/dev/sdb1; sync	
+sudo dd if=system.img of=/dev/sdb5; sync
+sudo dd if=recovery.img of=/dev/sdb2; sync
+
+//编译整个android
+export PATH=~/myandroid/bootable/bootloader/uboot-imx/tools:$PATH
+export CROSS_COMPILE=~/myandroid/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
+export ARCH=arm
+source build/envsetup.sh
+lunch 8
+make -j4
+// 编译uboot
+cd ~/android40/bootable/bootloader/uboot-imx
+export ARCH=arm
+export CROSS_COMPILE=~/android40/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
+make distclean
+make mx6q_sabresd_android_config
+make
+//编译 boot.img
+source build/envsetup.sh
+lunch sabresd_6dq-user
+make bootimage
+make recoveryimage
+//编译kernel
+export PATH=~/android40/bootable/bootloader/uboot-imx/tools:$PATH
+cd ~/android40/kernel_imx
+export ARCH=arm
+export CROSS_COMPILE=~/android40/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
+make imx6_android_defconfig
+make uImage
+//编译升级包
+source build/envsetup.sh
+lunch 8
+make otapackage
+
+//.............................
+http://wenku.baidu.com/view/9587886227d3240c8447efff.html
+http://www.cnblogs.com/hibraincol/archive/2011/05/11/2043671.html
+make update-api
+make systemimage
+mmm frameworks/base/services/java/
+make snod
+
+
+
+make systemimage - system.img
+make userdataimage - userdata.img
+make ramdisk - ramdisk.img
+make snod - 快速打包system.img 
+make bootimage
+
+am start -n com.android.camera/com.android.camera.Camera 
+
+am start -n com.android.music/com.android.music.MediaPlaybackActivity -d Story.mp3
+
+adb pull  /tmp/recovery.log
+adb  push c:\adb\recovery /
+
+gpio debug相关
+cat /sys/kernel/debug/gpio
+echo "3"> /sys/class/gpio/export
+echo "out"> /sys/class/gpio/gpio34/direction
+echo "in"> /sys/class/gpio/gpio3/direction
+echo "0"> /sys/class/gpio/gpio34/value
+echo "3"> /sys/class/gpio/unexport
+
+气压 mpl3115
+echo "1">>/sys/devices/virtual/input/input2/enable	使能设备
+/home/linaro/getevent /dev/input/event2		读取数据
+
+sht15相关
+cat /sys/class/hwmon/hwmon0/device/humidity1_input 湿度
+cat /sys/class/hwmon/hwmon0/device/temp1_input 温度
+
+LSM330D相关
+陀螺仪
+/sys/devices/platform/imx-i2c.0/i2c-0/0-006b/enable_device
+/sys/devices/platform/imx-i2c.0/i2c-0/0-006b/input/input3/event3/
+/dev/input/event3
+3D加速度
+/sys/devices/platform/imx-i2c.0/i2c-0/0-0018/enable_device
+/sys/devices/platform/imx-i2c.0/i2c-0/0-0018/input/input4/event4/
+/dev/input/event4
+
+rtc设备文件
+cd /sys/class/rtc/rtc0/ 
+cat date  
+cat time
+
+mag3110
+echo "1">>/sys/devices/virtual/input/input1/enable		使能设备
+/home/linaro/getevent /dev/input/event1		读取数据
+
+3D加速度校准
+cd /sys/devices/virtual/input/input2
+echo "3">>position
+
+光和接近传感器设备文件
+/sys/devices/virtual/input/input3
+echo "1">>enable_als    //使能
+echo "1">>enable_ps
+cat lux_adc //光强
+cat raw_adc //距离
+
+充电设备文件
+/sys/class/power_supply
+
+电源管理设备文件
+/sys/devices/platform/bq24103-charger.1
+
+光传感器 目录
+cat init.freescale.rc
+/sys/devices/virtual/input/input4
+
+sd卡相关目录
+cd /sys/class/mmc_host/
+/sys/devices/platform/sdhci-esdhc-imx.1/ 
+ busybox mount /dev/block/mmcblk1p1 /extsd/ 
+ sd卡配置挂载
+cat /etc/vold.fstab 
+ 
+bd相关设备文件
+/sys/devices/platform/bd_power/enable_rnss
+echo "1">>/sys/devices/platform/bd_power/enable_rdss
+
+watch dog 相关文件
+/dev/watchdog
+/sys/class/watchdog
+
+gs2965相关
+cd /sys/class/spi_master/spi0/spi0.0
+
+echo "0 10">> /sys/class/spi_master/spi0/spi0.0/gs2965
+cat /sys/class/spi_master/spi0/spi0.0/gs2965
+
+echo "12">> /sys/class/spi_master/spi0/spi0.0/gs2972_read
+echo "13">> /sys/class/spi_master/spi0/spi0.0/gs2972_read
+echo "14">> /sys/class/spi_master/spi0/spi0.0/gs2972_read
+echo "15">> /sys/class/spi_master/spi0/spi0.0/gs2972_read
+echo "200 0aa4">> /sys/class/spi_master/spi0/spi0.0/gs2972_write
+
+echo "on">>/sys/class/spi_master/spi0/spi0.0/close_screen
+echo "off">>/sys/class/spi_master/spi0/spi0.0/close_screen
+
+GS2971相关
+cat /sys/devices/platform/gs2971.0/gs2971_modes
+cat /sys/devices/platform/gs2971.0/gs2971_mode
+echo "1280x720P50">>/sys/devices/platform/gs2971.0/gs2971_mode
+echo "1920x1080I50">>/sys/devices/platform/gs2971.0/gs2971_mode
+echo "1920x1080I60">>/sys/devices/platform/gs2971.0/gs2971_mode
+echo "1440/720x576I50">>/sys/devices/platform/gs2971.0/gs2971_mode
+
+cat /sys/devices/platform/gs2971.0/gs2971_format
+echo "UYVY">>/sys/devices/platform/gs2971.0/gs2971_format
+echo "GENERIC_16">>/sys/devices/platform/gs2971.0/gs2971_format
+
+wm8524 声音直播相关
+echo "1">>/sys/devices/platform/imx-snd-gs2972.0/direct_config
+echo "0">>/sys/devices/platform/imx-snd-gs2972.0/direct_config
+
+电源模块状态监测
+cat /sys/devices/platform/pwr_detect/status
+
+./mxc_v4l2_tvin.out -ol 0 -ot 0 -ow 1280 -oh 720
+
+./mxc_v4l2_tvin.out -ol 0 -ot 0 -ow 1280 -oh 720
+
+
+
+fastboot flash boot \\192.168.0.199\lijianzhang\myandroid\out\target\product\sabresd_6dq\boot.img
+fastboot flash boot \\192.168.1.101\lijianzhang\myandroid4.2.2\out\target\product\sabresd_6dq\boot.img
+fastboot flash boot \\192.168.1.101\lijianzhang\myandroid\out\target\product\sabresd_6dq\boot.img
+fastboot用分区名称
+ptn 0 name='mbr' start=0 len=1
+ptn 1 name='bootloader' start=2 len=2046
+ptn 2 name='boot' start=16384 len=16384
+ptn 3 name='' start=0 len=0
+ptn 4 name='system' start=49153 len=1048575
+ptn 5 name='recovery' start=32768 len=16384
+
+
+   Device Boot Start   End    MiB    #blocks   Id  System
+/dev/mmcblk0p1         8     15      8       8192   83  Linux
+/dev/mmcblk0p2        16     23      8       8192   83  Linux
+/dev/mmcblk0p3        24   2895   2872    2940928    5  Extended
+/dev/mmcblk0p4      2896   7563   4668    4780032    b  W95 FAT32
+/dev/mmcblk0p5        24+   535    512-    524287+  83  Linux
+/dev/mmcblk0p6       536+   791    256-    262143+  83  Linux
+/dev/mmcblk0p7       792+  2839   2048-   2097151+  83  Linux
+/dev/mmcblk0p8      2840+  2847      8-      8191+  83  Linux
+/dev/mmcblk0p9      2848+  2855      8-      8191+  83  Linux
+
+
+ro.sf.lcd_density=240
+:set fileformat=unix
+返回 x120 y1400 主页x360 y1400 菜单x500 y1400
+
+屏幕 x539 y959
+
+
+看当前CPU频率 /sys/kernel/debug/clock/osc_clk/pll1_sys_main_clk/pll1_sw_clk
+
+printk("----------------------\n ldb_i2c probe\n -------------------\n");
+LOGE("---%s,%s %d---\n",__FILE__,__FUNCTION__,__LINE__);//lijianzhang
+printk("---%s,%s %d---\n",__FILE__,__FUNCTION__,__LINE__);//lijianzhang
+
+      
+技术支持   杨瑞  139 0244 1699
+   
+设置以及编译
+ ./ltib -m selectype	重新选择CPU类型
+ ./ltib -m config	 代码配置 
+ ./ltib 		 代码编译
+ ./ltib –m listpkgs 	列出所有ltib的包
+./ltib -m prep -p <package name>	取出包的代码放在./ltib/rpm/BUILD/
+./ltib -m scbuild -p kernel-3.0.35	修改代码后重新编译包
+./ltib -m scdeploy -p <package name>    将一个包安装到rootfs中
+
+./ltib -m scbuild -p kernel
+./ltib -m scbuild -p u-boot-v2009.08
+
+
+
+sudo dd if=~/Tsinghua_env/ltib/rpm/BUILD/u-boot-2009.08/u-boot.bin of=/dev/sdc bs=512 seek=2 skip=2 conv=fsync
+sudo dd if=~/Tsinghua_env/ltib/rpm/BUILD/linux-3.0.35/arch/arm/boot/uImage of=/dev/sdc bs=512 seek=2048 conv=fsync
+sudo fdisk /dev/sdc
+u
+d
+p
+n
+1
+16384
+sudo mkfs.ext3 /dev/sdc1
+sudo mount /dev/sdc1 ~/sdcard/
+sudo tar  --numeric-owner -zxvf Tsinghua_env/oneiric.tgz  -C sdcard/
+
+setenv loadaddr 0x10800000
+setenv bootargs_mmc 'setenv bootargs ${bootargs} root=/dev/mmcblk0p1 rootwait rw video=mxcfb1:dev=ldb,LDB-XGA,if=RGB666 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24'
+setenv bootargs_base 'setenv bootargs console=ttymxc0,115200'
+setenv bootcmd_mmc 'run bootargs_base bootargs_mmc;mmc dev 3;mmc read ${loadaddr} 0x800 0x2000;bootm'
+setenv bootcmd 'run bootcmd_mmc'
+save
+
+setenv bootargs_mmc 'setenv bootargs ${bootargs} root=/dev/mmcblk0p1 rootwait rw video=mxcfb1:dev=ldb,LDB-XGA,if=RGB666 video=mxcfb0:dev=hdmi,1920x1080M@60,bpp=32'
+video=mxcfb0:dev=hdmi,1920x1080M@60,bpp=32
+
+set ipaddr 192.168.0.149
+set ethaddr 00:04:0f:03:76:a0
+set gatewayip 192.168.0.1
+
+

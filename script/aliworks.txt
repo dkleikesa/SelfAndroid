@@ -1,0 +1,5496 @@
+﻿VDR内容，增加一个接口设置 设置只GPS工作，关闭pdr 实时的 跟历史轨迹没关系 怎么测试
+service 崩溃的统一管理 不要用requestLocationUpdates 的回调， 在SDK里面自己做一个 
+
+M算法相关代码整理
+MTK的flp可以定到位
+
+进程间通信要不要改
+
+闹钟概率性不能唤醒系统
+概率性SCREEN_ON广播
+
+亮屏切换丢失PDR数据
+  flush接口
+  update接口
+  
+haoju修改：
+1.增加flushBatchedLocations()  来读取剩余的数据
+2.增加updateBatchingOptions() 来重新设置读取时间间隔
+ (功耗参数没用，时间间隔代表上报周期，最小距离参数没用)  
+3.通知FLP唤醒GPS，通过修 改数据的头段TPDR来设定
+4.增加injectDiagnosticData(Sting)接口，来设定当前步数和当前距离
+
+
+PDR多用户问题，
+0.01-4.99s一下为实时上报，归于1s
+5s以上归为5的倍数，最大240s。实际睡眠时间为多应用的最小公约数（比如15s 20s 两个APP，唤醒的周期为5s）
+运动健康周利认为两灭屏时间对于运动健康不是很重要，只关心两灭屏切换
+
+
+底层通知APP:
+步数完成播报
+时间完成播报
+距离完成播报
+
+ 500米播报）
+
+APP通知底层:
+当前距离
+步数 （目标步数）
+时间 （开始时间，目标时间）
+距离 （目标距离）
+身高体重性别？
+
+高德定位SDK提供address，但是运动健康需不需要？
+
+start(state，type？)	 type需不需要？
+stop(type？) 			 type需不需要？
+setmode(int mode)
+request()建议返回Location的数组(解析json串太慢)
+update(listener)
+SetExtraParm(Bundle bdl)
+
+
+
+高德定位SDK提供address，但是运动健康需不需要？
+
+SendExtraCommand()
+
+liusha
+pdr 多实例（几种mode，或者5s的整数倍）
+与APP增加几个接口
+fusedhardware 增加的flush update 接口
+
+算法init
+showdemo自动request
+
+功能模块               					 外部方案（日期/天）	内部方案（日期/天）
+研发实施                
+										11月27日-12月17日		11月27日-12月10日
+系统框架搭建（包括batching模式预留）		3						2
+跨进程大数据通信模块   						1				       	1
+资料储存管理策略      					 	2						1
+接口设计\开发          						4						2
+SDK(1.4.7)版本兼容策略						3						2
+播报管理策略 								2						2
+测试	
+
+兼容测试（FLP1.4.7、高德地图）				12月18日-12月29日	8	12月11日-12月17日	5
+系统集成测试（FLP+地图客户端全功能测试）	12月30日-1月15日	13	12月18日-12月31日	10
+
+测试：
+老版本SDK(1.4.7)兼容性测试
+版本上报测试
+
+mode 切换测试
+
+request轨迹 （跟GPS对比）
+实时上报轨迹 （跟GPS对比）（多次request 多次remove）
+
+多APP测试
+
+
+
+
+跟高德地图共生测试
+
+播报测试（运动健康）
+
+
+12月10号 757 发版
+12月25号 758 发版
+
+spint：
+10月26日--30日  华为问题收敛
+11月2日---6日   MTK的issue 追踪
+
+历史轨迹现有问题：
+
+1.亮屏 读取时间间隔最长是多少？解决方案？
+  最长2s
+2.灭屏 读取时间间隔是多少？
+  1分钟
+3.亮屏时修改gps时间解决方案？
+  设置0 0
+4.最终版里面log日志文件，和kml文件要不要保留？
+
+5.B058 rom service 怎么升级？
+  
+6.pdr偶然会建多个文件的问题？
+
+20150915
+huawei flp service 第一组level正确 其他不正确的问题
+华为 next 最新rom PDR时间不对问题验证
+华为gps batching 模式新方式  开发验证
+解决FLPShowDemo request history 会卡住的问题
+
+20150916
+history log 和 kml 文件 大小和个数限制
+华为其他问题支持
+
+20150917
+vdr功能实现
+与华为沟通融合算法没有PDR只有GPS时候返回值的问题
+多组历史轨迹，进入融合算法，由于曲线平滑，造成轨迹不准确的问题
+
+20150918
+vdr功能实现验证
+华为支持
+
+
+20150921
+FLP service 历史轨迹 存储大小功能完善
+华为支持
+HistoryTrack 占用CPU过高的问题
+
+20150922
+华为支持
+java Thread 学习
+MTK 手机红屏问题
+
+20150923
+MTK 手机红屏问题
+flp service time interval 从配置文件读取
+historytrack 代码 所有exception 输出到log文件
+
+20150924
+MTK 手机红屏问题
+华为支持
+整理flp service代码
+
+20150925
+Release -1.3.9 不支持轨迹记录问题
+FLPservice 在P8崩溃问题问题
+北斗展会
+
+20150928
+batching GPS 验证
+VDR接口确认
+
+20150929
+VDR测试
+华为支持
+
+20151008
+华为支持
+service 增加 sdcard umount处理
+historytrack 整理变量和函数命名
+xml文件自动释放
+
+20151009
+final static super关键字学习
+java 命名规则学习
+java String StringBuffer 类学习
+
+20151010
+验证车载导航模式
+整理HistoryTrack VDR 架构图
+java学习
+
+20151012
+确认service崩溃的问题
+修改低功耗历史轨迹逻辑
+
+20151013
+确认service崩溃的问题
+低功耗历史轨迹逻辑确认
+华为烧写rom
+
+20151014
+低功耗历史轨迹逻辑实现
+
+20151015
+低功耗历史轨迹逻辑验证
+华为pdr置信度最开始几个点置信度不高的问题
+
+20151016
+java 多线程和并行开发学习
+mtk 手机测试准备
+
+20151019
+mtk 手机测试准备
+
+20151020
+mtk 手机测试
+
+20151021
+历史轨迹ppt整理
+
+20151022
+历史轨迹当关闭GPS的时候上报给APP
+华为运动健康支持
+
+20151023
+历史轨迹修改数据筛选逻辑
+华为支持
+
+20151026
+华为历史轨迹新逻辑确认
+历史轨迹亮屏时可以允许APP设置work和sleep时间
+历史轨迹读取逻辑改为，通知app读才读。
+
+20151030
+高德培训
+华为历史轨迹测试报告
+
+20151111
+华为运动健康支持
+历史轨迹测试项修订
+FLPservice最新需求修改
+
+20151112
+FLPservice修改自测
+准备历史轨迹测试手机
+
+20151116
+华为运动健康支持
+历史轨迹测试问题处理
+
+20151116
+华为运动健康支持
+历史轨迹测试问题处理
+
+20151117
+历史轨迹测试问题处理
+
+20151118
+历史轨迹issue处理
+运动健康支持
+ContentProvider用于大量数据进程间通信验证
+
+20151119
+历史轨迹issue处理
+运动健康需求讨论
+ContentProvider用于大量数据进程间通信验证
+历史轨迹现有问题点和解决方案文档整理
+
+20151120
+ContentProvider用于大量数据进程间通信验证
+SQLite 使用研究
+
+20151123
+SQLite 使用研究
+历史轨迹数据加密
+
+20151124
+历史轨迹0.2版本开发
+
+20151125
+历史轨迹0.2版本需求进一步讨论
+历史轨迹0.2版本开发
+
+20151126
+历史轨迹0.2版本开发
+
+20151127
+历史轨迹进度敲定
+历史轨迹0.2版本开发
+
+20151130
+历史轨迹V0.2总体逻辑实现
+
+20151201
+FLPShowDemo 显示V0.2轨迹
+历史轨迹V0.2 华为rom问题测试总结
+
+20151202
+历史轨迹V0.2 轨迹初步测试
+历史轨迹V0.2 sdk接口函数确定
+FlpService SDK 0.2版本开发
+
+20151203
+FlpService SDK 0.2版本开发
+linktodeath 实现
+FlpShowDemo 支持新SDK
+兼容性初步测试
+
+20151204
+FLP Service 支持新版本SDK
+关闭时存储数据
+崩溃时关闭记录
+ShowDemo 实时更新轨迹
+
+20151207
+超过24小时数据删除
+Service支持功能上报
+sdk函数说明整理
+整理wakelock
+多APP管理
+
+20151208
+多APP管理
+播报管理
+测试工具开发
+
+20151209
+华为batching GPS 需求确定
+测试case讨论，整理
+播报管理逻辑讨论，修改
+
+20151210
+历史轨迹修改looper有可能为空的bug
+准备测试用例
+历史轨迹接口华为串讲以及问题沟通
+
+20151211
+华为rom update接口验证
+华为rom 唤醒功能验证
+
+
+20151214
+AR管理
+华为新rom验证并提交问题
+
+20151215
+AR接入，并测试，反馈问题
+测试问题处理
+
+20151216
+华为北研所，接口以及逻辑讨论
+整理接口文档
+测试问题处理
+
+20151217
+整理操作说明文档给彭鼎
+找yanfei谈测试报告延时
+接口文档给wenqi 和 陈淼
+VDR接口问题确认
+PDR MISS 不上报bug问题
+
+
+20151221
+batchingGPS 信噪比
+读取当前AR状态
+接口问题
+
+20151222
+解决主线程会处理某些逻辑时间过长的问题
+batchingGPS 功能开发
+运动健康支持
+
+20151223
+batchingGPS 功能开发
+运动健康支持
+室内算法集成
+
+20151224
+运动健康支持
+室内算法验证
+
+20151225
+室内算法调用逻辑确认以及修改
+室内算法的测试
+
+20151228
+mode 设置不正确的bug 
+batchingGPS 功能开发
+
+20151229
+mtk pdr接通 
+室内算法验证
+v0.3 fused轨迹验证
+运动健康问题总结
+
+20151230
+接收vdr 广播来检测人步行状态
+batchingGPS 模块开发
+
+20151231
+batchingGPS 模块开发
+运动健康支持
+
+20160104
+type不能切换的bug
+batchingGPS 模块开发
+
+20160105
+更改AR调用逻辑，为只有步行和骑车时候才进入低功耗模式
+batching GPS调试以及验证
+运动健康轨迹拉直线问题协助分析
+熟悉matlab
+
+20160106
+修复AR调用中的一个bug
+修改FLP_mode 的读取方式
+运动健康支持
+亚楠测试
+
+20160107
+华为烧rom
+新rom重启问题跟踪
+batchingGPS 模块调试
+动健康关闭播报时，同样需要下发播报命令给底层
+修改历史轨迹逻辑每次开始运动都初始化融合算法
+修改收到60个GPS点才关闭GPS
+
+20160108
+修改每次开始运动前清理buffer
+首次定位立马上报位置
+有一次进入高功耗，就再也不进入低功耗了
+修改为10个有效点
+灭屏切换亮屏直接报上去，不要等10个有效GPS点
+
+20160111
+重新整理测试case
+knight手机重启问题
+运动健康支持
+batching GPS 功能验证以及bug修复
+
+20160112
+亚楠测试支持
+运动健康支持
+batchingGPS 不能上报GPS的问题跟踪
+batchingGPS 一个模式错误的bug
+
+20160113
+batchingGPS fix模式不能上报GPS的问题跟踪
+亚楠测试支持
+运动健康支持
+
+20160114
+batchingGPS fix模式不能上报GPS的问题验证
+flpshowdemo可以设置距离上报
+亚楠测试支持
+
+20160115
+batchingGPS 
+亚楠测试支持
+整理发版log
+
+20160118
+ MTK X20 flp测试
+ MTK X20 pdr连通以及室内算法验证
+
+20160119
+Huawei Issue 处理
+batchingGPS 相关测试
+
+20160120
+Huawei Issue 处理
+batchingGPS 新架构测试
+matlab学习
+
+20160121  ok                                                                                       
+mtk 硬件geofence调用不成功的bug
+batchingGPS 新架构测试
+matlab学习
+更改一个历史轨迹不能request的bug
+
+20160122
+batchingGPS 新架构测试
+matlab学习
+
+20160125
+batchingGPS 博通新模块测试
+运动健康测试
+matlab学习
+
+20160126
+batchingGPS 博通新模块测试
+ota升级测试
+
+20160127
+batchingGPS 博通新模块测试
+ota升级测试
+FLP 版本编译验证
+
+20160128
+ota升级测试
+历史轨迹测试
+1.showdemo 加按钮
+2.关闭自己计算的播报
+
+20160129
+历史轨迹测试
+距离小于某个值直接发最小值，没有播报直接发0
+新版本验证
+到时间以后下发flush
+
+20160201
+历史轨迹测试
+到时间以后下发flush
+flp pdr兼容Android5.0 和 6.0
+
+20160202
+历史轨迹测试
+knight 和 eva 下发播报距离 逻辑分开
+
+20160203
+knight 测试 问题反馈
+
+20160204
+knight 测试
+历史轨迹文档整理
+
+20160217
+历史轨迹自动测试项整理
+硬件数据采集以及mock 架构搭建
+
+20160218
+硬件接口测试MainActivity已经总流程实现 
+
+20160219
+硬件接口测试AR GPS BatchingGPS PDR 模块实现
+
+20160222
+硬件接口测试geofence 模块实现
+硬件接口测试pdr batchingGPS 功能独立
+
+ 20160223
+硬件接口测试pdr batchingGPS 功能独立
+mock实现方式讨论
+mock数据采集实现
+
+ 20160224
+mock实现
+mock数据采集实现
+Knight 历史轨迹测试以及问题反馈
+历史轨迹测试项增加
+
+20160225
+mock实现
+mock数据采集实现
+自我总结和半年计划
+历史轨迹问题反馈
+
+20160226
+mock实现
+mock数据采集实现
+
+20160229
+pdr mock数据采集
+pdr mock读取文件，逻辑架构实现
+
+20160301
+pdr mock测试
+batching GPS mock实现
+GPS mock 实现
+
+20160302
+AR mock实现
+GPS mock 实现
+
+20160303
+AR mock测试
+Bathing GPS mock 实现 测试
+
+20160304
+geofence mock 实现测试
+硬件接口测试文档 以及 mock文档整理
+华为 GNSS status 状态上报功能
+更新历史轨迹接口
+运动健康沟通
+
+20160307
+华为 GNSS status 状态上报功能验证
+硬件接口测试文档 以及 mock文档整理
+硬件接口以及 mock启动方式增加debug 条件判断
+
+20160308
+Mock数据抓取
+mock功能测试
+gps开关控制 batchingGPS 功能讨论
+运动健康GNSS 状态支持
+博通batchingGPS 偶尔会上报经纬度均为0的点 ,造成showdemo崩溃
+
+20160309
+twiki词条整理
+启动时，偶然情况下读取不到sd卡
+Mock数据抓取
+mock功能测试
+
+20160310
+Mock数据抓取
+mock功能测试
+
+20160311
+华为新包验证
+mock功能测试
+测项整理
+地图sdk 短时间内频繁画点，内存溢出造成showdemo崩溃
+
+20160314
+运动健康问题分析
+Location Settings 要控制历史轨迹功能。
+1.6.1发版测试
+
+20160315
+1.6.1发版测试问题总结
+Location Settings 要控制历史轨迹功能。
+
+20160316
+历史轨迹接口文档增加补充说明
+Location Settings 要控制历史轨迹功能测试
+History 純軟方案 - GPS only 
+
+20160317
+历史轨迹接口文档增加补充说明
+Location Settings 修改逻辑支持多个ID
+History 純軟方案 - GPS only 
+
+20160318
+monkey 测试 exception 分析
+History 純軟方案 测试
+
+20160321
+History 純軟方案 测试
+运动健康 暂停运动 恢复问题分析
+历史轨迹测项增加 location setting测试
+
+20160322
+Mock SDK TC Support
+android 启动 代码学习
+
+20160323
+Mock SDK TC Support
+运动健康 问题分析
+android 启动 代码学习
+
+20160324
+Mock SDK TC Support
+android 启动 代码学习
+华为 手机升级以后，运动健康拿不到位置问题分析
+
+20160325
+Mock SDK TC Support
+android 启动 代码学习
+
+20160328
+OTA 機制上線过程梳理
+
+20160329
+Vivo问题梳理
+6.0代码，查看环境搭建
+samba 服务器搭建
+
+20160330
+历史轨迹测试支持
+运动健康崩溃以后，gnss状态丢失问题处理
+ FLP AutoTC 開發(history)
+
+20160331
+历史轨迹测试支持
+android TC 架构学习
+ 0160401
+华为烧rom
+FLP AutoTC 開發(history)
+
+20160405
+1.6.2发版测试
+历史轨迹增加精度和海拔的参数
+
+20160406
+FLP AutoTC 開發(history)
+database增加字段 与前一版本的兼容性问题	
+1.6.2测试支持以及问题分析
+
+20160407
+FLP AutoTC 開發(history)
+1.6.2测试支持以及问题分析
+
+20160408
+FLP AutoTC 開發(history)
+内存dump 以及内存泄露分析方法学习
+华为运动健康，使用地图sdk消耗流量问题
+自动化测试流程梳理
+
+20160411
+FLP AutoTC 開發(history)
+mock功能，多线程同时读取文件bug
+vivo测试以及问题反馈
+
+20160412
+vivo测试以及问题反馈
+运动健康偶然情况下，不调用flp问题
+
+
+20160413
+vivo测试以及问题反馈
+多线程使用BufferedReader 同时读取同一个File，冲突问题 验证
+OTA问题梳理
+
+20160414
+OTA问题梳理
+vivo测试以及问题反馈
+mock功能vivo测试不成功
+年度工作计划
+
+20160415
+OTA客户端代码学习
+vivo测试以及问题反馈
+OTA 服务器与客户端通信过程梳理
+
+20160418
+电脑重装系统
+
+20160419
+升级android N sdk 以后，eclipse 编译失败的问题
+vivo 新包 测试
+合并hardware test activity中的 pdr test和batchingGPS test为fused 测试
+
+20160420
+vivo 测项
+奖项申报材料整理和书写
+
+20160421
+mock功能偶然情况下会多次start问题
+vivo 历史轨迹适配
+  inject 不能下发
+运动健康偶然情况下不画点的问题分析
+
+20160422
+fifo模式要下发最小距离
+vivo mock调试，自动化测项
+
+20160425
+vivo测项开发验证
+
+20160426
+framework绑定flp相关代码学习
+vivo 不绑定 flp service问题确认
+
+20160427
+framework绑定flp相关代码学习
+vivo 问题追踪
+运动健康画的轨迹不准确问题分析
+
+20160428
+vivo 问题追踪
+运动健康画的轨迹不准确问题复现 复现demo
+历史轨迹错误码整理
+aMap.moveCamera fatal问题反馈
+
+20160429
+运动健康画的轨迹不准确问题追踪
+1.6.3版本 vivo PDR效能测试
+
+20160503
+OTA 验证
+vivo 测试
+
+20160504
+OTA 多渠道升级验证
+vivo flp效果测试 PDR
+
+20160505
+OTA 多渠道验证
+vivo flp效果测试-公交步导--VDR
+
+20160506
+vivo flp测试结果ppt整理
+室外返回网络定位的问题分析
+
+20160509
+vivo 问题复测
+OTA正式网的URL问题追踪
+
+20160510
+OTA正式网的URL问题追踪
+VIVO Hardware 測項開發驗證
+AR linktodeath响应逻辑讨论
+
+20160511
+AR响应linkToDeath
+VIVO Hardware 測項開發驗證
+
+20160512
+更新 flp ota channel名字
+VIVO AR 历史轨迹测试
+
+20160513
+高通出差调试
+
+20160516
+高通反馈问题追踪
+flp ota 升级更新channel 以后测试网验证
+
+20160517
+高通反馈问题追踪
+flp ota 升级更新channel以后 加密字段错误
+
+
+20160518
+高通反馈问题追踪
+
+20160519
+高通反馈问题追踪
+
+20160520
+高通反馈问题追踪
+vivo 测试
+
+20160523
+高通反馈问题追踪
+SDK Geofence 架構研究梳理 
+
+20160524
+高通PDR VDR 测试
+看运动健康源码分析进入室内缺少轨迹的问题
+
+20160525
+flp sdk 连接flp service 超时问题讨论
+vdr问题让高通确认一下
+测试一下framework 的flp
+室内定位问题
+2s更新的问题
+fifo问题
+geofence 问题
+
+20160526
+vivo问题追踪
+SDK Geofence 架構研究梳理 
+
+20160527
+vivo问题追踪
+看运动健康源码分析进入室内不更新轨迹问题 
+
+20160530
+vivo问题追踪
+vivo 测试报告整理
+
+20160531
+vivo问题追踪
+SDK Geofence 架構研究梳理 
+商务讨论vivo测试报告问题
+
+20160601
+vivo AR 驾车时间测试
+vivo 测试报告 增加场景加对比图
+vivo 测试报告 增加结论判断
+代码format 整理
+
+20160602
+vivo AR 驾车时间测试
+SDK Geofence 架構研究梳理 
+gms ios geofence调研
+
+20160603
+确认 flp里调用AR  或者 sensor的地方，去掉以后确认是否影响sensor采样率
+geofence 架构梳理
+
+
+20160606
+SDK Geofence 架構研究梳理
+
+20160607
+google NLP TravelDetection代码学习
+vivo问题反馈
+flp sdk1.6.2 华为发版
+
+20160608
+google NLP TravelDetection代码学习
+vivo问题反馈
+flp 华为 QC版本 历史轨迹开发以及发版
+
+20160612
+google NLP TravelDetection代码学习
+vivo问题反馈
+geofence 架构设计文档
+flp增加 调用者显示的 activity
+
+20160613
+flp增加 调用者显示的 activity
+geofence 架构设计文档
+
+20160614
+google geofencer代码学习
+geofence 架构设计文档
+
+20160615
+google geofencer代码学习
+geofence 架构设计文档
+历史轨迹DB存储偶然抛出空指针异常问题分析解决
+
+0160616
+geofence 架构设计文档
+flp 测试activity文档更新
+vivo发版验证
+vivo 新包验证
+
+0160617
+geofence 架构设计文档
+vivo问题追踪
+
+0160620
+历史轨迹DB 数据库降级，删除所有历史数据。
+vivo问题追踪
+Geofence 架構梳理 & Porting
+
+0160621
+vivo问题追踪
+Geofence 架構梳理 & Porting
+
+0160622
+vivo问题追踪
+flp service 6.0动态权限检查增加弹窗
+Geofence 架構梳理 & Porting
+
+0160623
+vivo问题追踪
+flp service 6.0动态权限检查修改 throw exception 问题
+三星历史轨迹
+
+0160624
+vivo问题追踪
+kml解析相关代码
+
+0160627
+git 不区分大小写问题研究解决
+Geofence 架構梳理 & Porting
+
+0160628
+vivo 测试报告验证
+Geofence 架構梳理 & Porting
+
+0160629
+runntime permission check 在nexus 上 crash 问题分析解决
+Geofence 架構梳理 & Porting
+
+0160630
+vivo 测试
+vivo gps图标不消失问题
+vivo flp balance power 会访问硬件flp问题
+Geofence 架構梳理 & Porting
+
+0160701
+vivo 测试
+Geofence 架構梳理 & Porting
+公版高德地图，在flp手机上不下发导航字段问题确认分析
+
+0160704
+Geofence第一期实现
+vivo SAP 问题跟踪反馈
+
+0160705
+Geofence第一期实现
+vivo SAP 问题跟踪反馈
+PendingIntent 保存到本地磁盘问题研究
+
+0160706
+Geofence第一期实现
+
+0160707
+vivo flp fifo状况测试
+测试组 技术分享会
+Geofence第一期实现
+
+0160708
+Geofence第一期实现
+PendingIntent APP crash以后保存问题研究
+
+20160711
+Geofence第一期实现
+
+20160712
+Geofence第一期 测试工具demo 修改
+华为FRD手机 batching 定不到位问题分析
+多线程操作List 和 Map exception的问题分析解决
+
+20160713
+Geofence第一期 位置来源策略设计 实现
+
+20160714
+Geofence第一期 位置来源策略设计 实现
+轮询周期策略实现
+
+20160715
+geofence 多个source的location 选择 策略
+
+20160718
+Runtime permission check 在nexus5上弹窗crash
+mock 工具 使用和 位置调用策略 交流 
+
+20160719
+华为MAH 1.6.5FLP service 不能调用startbatching问题分析
+mac地址转网络位置小工具 研究
+
+20160720
+mac地址转网络位置小工具 测试网URL 权限问题确认
+华为FRD手机 低功耗轨迹记录 轨迹丢失问题跟踪
+华为MAH手机 低功耗轨迹记录 startbatching 问题跟踪
+oppo flp 不启动问题分析
+高德地图 反复打开导致不能定位问题分析
+
+20160721
+Geofence 初步测试
+高德地图 反复打开导致不能定位问题分析
+flp启动时序问题导致命令下发失败问题分析 解决
+
+20160722
+离线加密crash问题分析
+flp启动时序问题导致命令下发失败问题 华为发版本验证
+QA提出 权限弹窗，每个权限同时只存在一个,问题修复
+
+20160725
+Geofence测试 数据整理
+Geofence 测试以及策略调整
+
+20160726
+Geofence 测试以及策略调整
+MAH手机不能调用startBatching问题跟踪反馈
+Geofence 基站离线功能 增加验证
+
+20160727
+Geofence 测试以及策略调整
+Geofence 基站离线功能 增加验证
+vivo 预装问题讨论
+
+20160728
+Geofence 基站离线功能 增加验证
+vivo geofence功耗测试demo准备
+
+20160729
+Geofence 基站离线功能 增加验证
+vivo geofence功耗测试demo准备
+
+20160803
+MAH FLP启动时序问题跟踪分析
+Geofence 基站离线功能 增加验证
+
+20160804
+Geofence 基站离线功能 增加验证
+
+20160805
+Geofence 基站离线功能 增加验证
+CopyOnWriteArrayList remove exception问题分析解决
+
+20160808
+基站离线代码流程梳理
+Geofence增加基站离线功能
+
+20160809
+PendingIntent 打开activity 功能验证
+Geofence事件启动showdemo功能增加，验证
+Geofence增加基站离线功能
+
+20160810
+Geofence增加基站离线功能
+离线功能测试
+
+20160811
+Geofence增加hardware 支持
+Geofence增加基站离线功能
+离线功能测试
+
+20160812
+Geofence增加基站离线功能
+离线功能测试
+
+20160815
+Geofence增加APP卸载或者重装以后移除其所注册的所有围栏
+基站离线数据解析工具
+离线基站数据分析
+
+20160816
+离线基站数据分析
+基站离线数据问题沟通
+LocationManager 临时保存PendingIntent问题研究实验
+
+20160817
+基站离线数据问题沟通
+LocationManager 临时保存PendingIntent问题研究实验
+Geofence参数保存功能实现
+
+20160818
+Geofence参数保存功能实现
+Geofence更新策略：由相同的ID直接返回修改为 相同ID新参数替换旧参数
+
+20160819
+Geofence参数保存功能实现:慢速恢复策略 -- 在恢复以前有add和remove操作
+
+20160822
+Geofence参数保存功能实现:慢速恢复策略 -- 在恢复以前有add和remove操作
+历史轨迹调用StartBatching 和 requestHistoricalTrackUpdates 顺序错误问题分析解决
+
+20160823
+Geofence参数保存功能实现:慢速恢复策略 -- 在恢复以前有add和remove操作
+历史轨迹调用 StartBatching 和 requestHistoricalTrackUpdates 顺序错误 给华为发包，测试
+
+20160824
+Geofence参数保存功能测试以及问题修复
+保存PendingIntent 其他方式研究
+开机广播和APP卸载广播，不能同时接受问题研究
+恢复过程中 每个APP fence数目限制功能实现
+1.5.4版本编译
+
+20160825
+Geofence参数保存功能测试以及问题修复
+flp service正常运行过程中，进行升级，fence数据删除功能
+geofence log 保存功能整理
+
+20160826
+测试activity展示所有围栏以及当前状态
+R tree代码研究
+
+20160829
+测试activity围栏状态显示优化
+geofence文档补充整理
+华为：不停的注入位置导致系统功耗大 问题分析
+
+20160830
+R tree代码研究
+R tree性能测试方法研究
+华为：不停的注入位置导致系统功耗大 问题跟踪
+
+20160831
+R tree性能和现有算法比较
+其他R tree实现 调研以及性能比较
+
+20160901
+其他R tree实现 调研以及性能比较
+R tree使用策略设计实现
+
+20160902
+基站离线下载新代码review 以及问题需求分析
+离线数据一周内不能重复下载问题沟通解决
+
+20160905
+离线数据不能下载问题沟通
+协助泽干测试geofence
+AR代码学习,以及在geofence 中的应用研究
+
+20160906
+离线数据不能下载问题协调
+离线数据gzip不能解压问题协调
+离线数据解析工具增加 瓦片边界显示在google earth功能
+AR代码学习,以及在geofence 中的应用研究
+
+20160907
+离线数据gzip不能解压，
+不能搜到当前基站问题沟通
+搜索离线数据效率太低问题分析
+AR代码学习,以及在geofence 中的应用研究
+
+20160908
+geofence: flp sdk release
+geofence 发版周期沟通确认
+geofence 文档整理
+geofence测试case 梳理
+
+20160909
+geofence 增加wgs84和gcj02坐标类型的支持
+geofence 实地测试
+
+20160912
+geofence 测试以及 问题总结
+geofence测试项整理
+通过NlpManager访问NLP remove以后仍然定位
+
+20160913
+showdemo杀掉以后被geofence唤醒，地图上直接显示fence当前状态
+旧sdk 新FLP monkey测试
+flp sdk destory exception问题分析修改
+
+20160914
+旧sdk 新FLP monkey测试
+flp sdk destory exception问题分析修改
+华为 destory以后 getinstance 不能拿到 ON_CONNECTED的信号问题分析
+
+20160918
+功耗测试流程摸索
+geofence相关问题讨论
+华为 destory以后 getinstance 不能拿到 ON_CONNECTED的信号问题 sdk 华为发版验证
+
+20160919
+功耗测试流程搭建
+addgeofence增加 靠PengdingIntent返回值
+geofence 增加gps调用策略
+
+20160920
+geofence 新策略测试
+离线cell代码测试
+与测试和产品沟通，确认测试周期和流程
+调用NlpManager requestNlp 然后再removeNlp 以后NLP定位不停止 问题协助复现 测试
+
+20160921
+geofence 更新策略以及测试
+geofence却认乐视需求
+华为问题会议
+
+20160922
+geofence 补充测试case 以及自测
+补充showdemo说明以及 hardware activity说明文档
+
+20160923
+geofence bug修复 
+geofence 自测结果报告整理
+cell离线代码测试
+测试 FLPApiTest anr问题分析
+华为新手机安装FLP以及问题解决
+测试【Android N】History 历史轨迹功能， batch 模式无法批量返回 问题分析
+
+20160926
+geofence 测试
+手机休眠后策略制定
+
+
+20160927
+geofence增加 RTC wakeup 策略
+geofence增加NotificationResponseTime 和LoiteringDelayMs 参数支持
+NLP家和公司 跳点问题
+运动健康高功耗问题分析
+geofence 测试
+
+20160928
+Geofence 测试报告整理
+Geofence 测试
+
+20160929
+Geofence 测试
+Geofence 测试报告整理
+flp crash log上报系统了解沟通
+
+20160930
+Geofence 测试报告整理
+flp crash log上报系统代码学习
+
+20161008
+flp crash log上报系统了解沟通
+crash上报系统 demo测试
+
+20161009
+oppo geofence测试用例 review
+flp crash log上报系统问题收敛
+flp crash log上报系统接口实现
+
+20161010
+crash log上报系统接口实现
+crash log上报系统URL 加密问题讨论
+crash log上报系统 demo测试
+大花 小米手机fip不能打开GPS问题
+
+20161011
+flp crash log上报系统问题收敛
+crash log上报系统 demo测试
+tid sdk接入
+crash log上报系统URL 鉴权问题，沟通解决
+crash log上报系统URL加密问题实现
+
+20161012
+crash log上报系统 服务端联调
+协助建挺解决 6.0上log不能上传bug
+crash log上报系统 测试工具准备
+
+20161013
+crash log url 加密算法 C化 问题讨论
+crash 制造 方法讨论以及实现
+flp增加 制造crash 测试activity
+studio 导出jar 包研究
+flp质量提升计划 讨论
+
+20161014
+flp 代码 review
+geofence相关讨论
+
+20161017
+flp 代码 review
+geofence相关讨论
+建挺新sdk接入
+
+20161018
+建挺新sdk接入flp
+crash log上报系统问题收敛
+上传log，协助服务端联调
+crash log上报系统增加动态权限检查
+
+20161019
+crash log上报系统问题收敛
+flp 代码 review以及类图整理
+华为case分析
+
+20161020
+crash log上报系统问题收敛
+crash log上报系统测试case设计
+geofence相关讨论
+flp 代码 时序图整理
+华为case分析
+
+20161021
+crash log上报系统问题收敛
+flp 代码关键点整理
+
+20161024
+crash log上报系统联调
+离线三期 geofence相关需求以及问题讨论
+crash log上报系统增加崩溃次数限制，防止循环crash以后不停上报
+crash log上报系统Aone 自动提bug功能接口不对问题分析以及解决
+
+20161025
+crash log上报系统联调
+华为case分析
+重构支持
+crash log上报系统提测
+
+20161026
+crash log上报系统测试支持
+flp 模块梳理以及代码review
+
+20161027
+crash log上报系统测试支持
+flp 模块梳理以及代码review
+MAH手机上报crash log ，服务端不能收到bug 协助分析协调
+
+20161028
+flp 模块梳理以及代码review
+crash log系统修改逻辑：仅在wifi下上传
+crash log galaxy读取数据库失败问题跟踪
+
+20161031
+flp 模块梳理以及代码review
+flp case分析
+crash log galaxy读取数据库失败问题跟踪
+
+20161101
+flp 模块梳理以及代码review
+flp case分析
+crash log galaxy读取数据库失败问题修复
+
+20161102
+NLP 模块梳理以及代码review
+flp case分析
+crash log系统增加本地文件最多保存10M的限制
+crash log系统文档输出以及测试支持
+flp重构模块讨论
+华为硬件Geofence实施策略讨论会议
+
+20161103
+NLP 代码review
+flp case分析
+crash log 测试支持以及问题分析
+java crash和 jni crash抓取方法研究学习
+
+20161104
+NLP 代码review
+重构讨论会
+华为低功耗导航:协助志龙调试amap的geofence接口
+
+20161107
+建挺修改后sdk自测
+华为硬件geofence讨论
+MAH crash argus 不展示问题追踪解决
+flp sdk 修改整理
+crash log 修改逻辑后文档整理
+crash log显示上传timeout ，服务端查看到上传数据，手机中crash文件未删除 问题追踪
+
+20161108
+一加11-05使用高德地图时，无法定位的问题 
+Geofence 低功耗导航方案以及接口确认讨论
+crash log显示上传timeout，服务端查看到上传数据，手机中crash文件未删除 问题已经明确，等待确认是否做修改。
+GNLP代码review
+flp sdk 重构讨论
+
+20161109
+amap 定位sdk 工程编译以及 代码逻辑梳理
+geofence低功耗导航 方案 amap定位sdk 相关代码逻辑修改
+geofence低功耗导航 方案 amap定位sdk 修改后代码自测：可以下发到硬件接口，硬件接口返回可以触发PendingIntent返回
+crash 上传 上传79个log后只展示2条 问题追踪确认
+crash 上传 argus 页面只展示18条问题追踪确认
+NLP 重构讨论
+
+20161110
+amap定位sdk  amapService流程了解
+geofence低功耗导航 方案 客户端开发支持
+VIVO报高德地图网络定位不准，深圳出差准备
+
+20161111
+vivo网络位置不准问题与vivo确认相关测试环境测试细节以及相关测试准备工作
+高德百度腾讯 地图对比测试
+写log抓取脚本
+
+20161112
+长安取测试手机
+乡村、高速、城镇定位效果测试
+抓取log以及基本结果分析
+
+20161113
+地铁、城市定位效果测试
+抓取log以及基本结果分析
+
+20161114
+vivo归还测试手机
+回北京
+
+20161115
+vivo log 协助分析
+flp 调度中心重构讨论
+geofence低功耗导航:志龙开发协助
+geofence低功耗导航:测试代码开发，接口联调。
+geofence低功耗导航:amap 定位sdk代码梳理 确认amap service是否会影响geofence下发
+
+20161116
+华为 flp 1.8.0.13 crash 问题分析
+geofence低功耗导航: 华为新手机 硬件geofence调试以及问题反馈
+geofence低功耗导航: 联调
+重构：工程编译以及geofence模块现有代码梳理
+
+
+20161117
+geofence低功耗导航: bug修复以及志龙联调完成
+geofence低功耗导航: 硬件geofence不触发，和明发一起分析原因
+亚楠 coverity 问题分析 
+vivo问题讨论会
+flp重构讨论
+gradle 编译培训会
+
+20161118
+geofence低功耗导航:坐标转换插件方案与华为同步
+geofence低功耗导航: 硬件层已经调通，但是手机自动重启进入fastboot模式需要华为解决
+重构 geofence讨论
+
+20161121
+geofence低功耗导航:华为rom问题协助跟踪
+刘沙修改代码 review
+重构 geofence 设计文档整理 
+重构 geofence GeofenceHardwareManager代码整理，增加注释，去掉无意义代码
+重构 geofence 第三方APP下发参数保存代码实现
+
+20161122
+flp 重构review
+converity问题 处理
+argus平台迁移 协助测试
+crash上报 合并主线，提交mergerequest
+
+20161123
+converity问题 处理完成 提交merge
+坐标转换插件方案以及接口确认
+重构 flp sdk和 indoor 模块代码review
+
+20161124
+converity问题 代码review
+坐标转换插件方案确认
+重构 geofence 主键有packageName改为UID
+重构 geofence flp sdk 接口开发完成
+重构 geofence 整体架构设计、文档、问题梳理
+
+20161125
+重构 geofence:设计review
+重构 geofence:hardware 下发部分开发
+
+20161128
+刘沙部分 converity问题解决
+重构 geofence 软件方案开发 测试
+重构 geofence 硬件方案增加 84和02坐标支持
+低功耗导航:与明发确认geofence参数
+低功耗导航:协助明发解决 导航demo geofence 不能下发的bug
+
+20161129
+重构 geofence: 开发、自测以及bug fix
+重构 geofence: javaDoc 以及文档补充
+重构 geofence: 重构工程创建
+专利问题沟通。
+
+20161130
+重构 geofence: 重构工程创建以及代码提交
+重构 geofence: flp sdk 添加geofence新接口
+重构 geofence: 文档、类图、wiki整理
+
+20161201
+重构 geofence: wiki剩余部分文档整理完成。
+重构 geofence: 代码review
+重构 geofence: 测试demo开发
+泽干 converity问题处理
+
+20161202
+泽干 剩余 converity问题处理合并主线
+重构 geofence： review 问题修改
+重构 geofence：测试demo开发
+fusedhardware 代码review
+AR 代码review
+
+20161205
+flp调度中心 初始化 讨论
+重构geofence: 测试demo开发测试
+
+20161206
+重构geofence: 测试demo开发测试
+flp sdk测试支持
+调度中心 flp geofence 集成测试支持
+重构flp_test 工程搭建以及代码梳理
+
+20161207
+flp sdk测试问题支持
+讨论flp 重构后续工作安排
+历史轨迹设计文档整理
+协调支持 batching测试手机
+信号源和hardwareFLP事件分发，没有new 对象，容易造成冲突问题分析讨论
+
+20161208
+重构:代码梳理
+重构:历史轨迹设计文档、模块图、流程图整理
+runtimePermission 弹窗问题 处理
+
+20161212
+重构历史轨迹:对外依赖屡清、准备设计review、工程以及测试demo搭建
+协调支持 batching测试手机: 最新updata包验证
+一加: 待机过程中的疑问支持回答
+调度中心 flp geofence 集成测试支持
+
+20161213
+重构历史轨迹:工程以及测试demo搭建完成
+重构历史轨迹:多用户逻辑梳理
+重构历史轨迹:设计review完成
+
+
+20161214
+坐标转换插件: 编译细节咨询讨论
+重构：
+ pdr：重构设计讨论
+ FLP调度中心 设计review
+ 历史轨迹：需求确认，代码编写
+flp case:
+ 运动健康，台湾地区使用高德地图的轨迹整体偏移问题跟踪处理
+ MAH导航提示信号弱
+ MAH首次打开高德地图定位提示失败，再点定位才成功。
+ MAH导航过程中定位不准
+ 
+20161215
+ 重构：历史轨迹多APP 多用户管理 开发完成
+ 重构: extraCmd命令梳理
+ 坐标转换插件: 华为对bin文件加密过程细节咨询讨论
+
+20161219
+ binder 获取调用者uid 研究
+ 坐标转换插件:申请文党修改，编译细节讨论
+ flp sdk 和定位sdk问题讨论
+ 重构:历史轨迹模块依赖接入以及架构整理
+ flp调度中心讨论
+ 
+20161220
+用户case分析:公司内部人员反馈 无法定位问题跟进 //无log，跟测试人员沟通注意事项后，复测重现问题
+雨庆 pdr 测试demo搭建支持 
+重构历史轨迹：测试demo搭建完成
+
+20161221
+坐标转换插件：江雄 接口细节确认
+坐标转换插件：高德鉴权方式确认，并整理文档 //高德给华为一个认证key，下发插件前华为将key发送给FLP做鉴权，成功后下发插件。
+重构：历史轨迹PDR batchingGPS 自测
+重构：历史轨迹 Database接入基础模块
+Converity问题解决 14个已经完成。
+
+20161222
+重构: 历史轨迹 与基础模块联调完成
+发现 pdr batching模式不成功问题协调雨庆解决
+坐标转换插件: 代码准备
+华为case:上海华为反馈：高德地图定位不准，相差2-3公里 //cache定位错误
+
+20161223
+华为case:高德地图等着等着等着，自己偏移了 //cache定位错误
+低功耗导航协助赵洋测试
+坐标转换插件: 李江雄协调联编 编译器以及使用方法。
+重构历史轨迹: 文档代码以及 marven完成，等待review后提测
+协助GPS采集 刷系统
+
+
+20161226
+nexus 6P 三星S7 刷rom
+华为 业务应用类软件安全需求规格书 填写
+重构历史轨迹：代码review以及问题修改
+坐标转换插件：代码准备
+bug: 设置中定位模式无法切换到网络定位模式
+
+20161227
+历史轨迹:问题整理，trace接入，类图、文档、javadoc修改 //已经提测提测
+坐标转换插件：代码准备以及预编译 //已经找到相应代码，并且编译通过，正在修改名称
+
+20161228
+case: 开启地理位置拍照时，照片定位显示便宜
+坐标转换插件：与江雄确认编译器以及编译的大概流程//已经拿到编译器可执行版本，等待华为提供修改后的版本。
+坐标转换插件: 联编代码准备以及预编译//geofence、鉴权、POI搜索 部分已经完成。
+梳理geofence相关专利点并与法务交流。 
+
+20161229
+坐标转换插件: 联编代码路径规划完成
+坐标转换插件: 代码编译后占用内存较大，整理代码删除全局变量 //整理后用12字节
+协助赵洋分析 低功耗导航 位置不更新问题
+
+20161230
+重构:  flp 鉴权模块逻辑梳理以及代码修改
+
+20170103
+重构：历史轨迹trace整理完成
+重构: flp鉴权模块代码逻辑梳理完成
+重构: flp鉴权模块代码白名单、加密方法、DB基础模块接入以及问题整理修复完成
+ 
+20170104
+重构: flp鉴权模块将白名单判断修改成同步方式，已经完成并自测通过
+重构: flp鉴权模块log、trace、javaDoc、基础模块接入完成
+重构: flp调度中心review
+
+20170105
+重构: flp鉴权模块 修改validateKey逻辑，更好的支持多APP访问
+重构: flp鉴权模块 网络库接入，并且自测完成
+重构: flp主工程整理，可以编译通过
+重构: 历史轨迹更改接口，去掉ConstGlobal的访问改由参数传入
+重构: 历史轨迹适配最新的trace规范 //已经提交新版本
+
+20170106
+重构：crash log上传 重构整理
+
+
+20170109
+修电脑
+下半年绩效整理
+华为运动健康备案问题跟进 //答案涉密，正在协调如何回复
+华为运动健康ployline问题跟进 //开放平台正在处理
+
+20170110
+专利申请撰写
+geofence trace整理、提交新版本
+反馈代码review
+华为运动健康备案问题跟进 //答案涉密，由商务统一回复
+华为运动健康ployline问题跟进 //由开放平台唐旭东负责回复，已经建议华为升级最新的sdk
+
+20170111
+历史轨迹：配合集成增加const变量
+flp test模块代码整理
+参加NLP问题排查 分享会
+
+20170112
+flp test 模块接入，注释 wiki整理 //还有NLP 和 主工程相关模块没接入
+华为NLP 功耗问题复查
+主工程编译问题排查
+flp状态机review
+
+20170113
+flp hardware增加getStatus方法
+flp 主工程 NLP增加getstatus方法
+flp test测试demo开发、自测、提交版本
+
+20170116
+DTS2017010601282 高德地图定位显示慢 //，跳点过滤，导致20s没有位置返回，定位失败
+flp test 修改包名后升级
+converity问题处理
+cdma 3G情况下 sid问题确认
+
+20170117
+flp 主工程编译运行不成功问题 跟踪
+flp test 字体颜色不对问题分析解决
+flp 集成后 geofence和历史轨迹自测以及问题解决
+
+20170118
+和法务讨论 专利CN20172149创新性问题
+flp 集成后 geofence和历史轨迹自测以及问题解决// 修改geofence一个bug并提交新版
+flp 集成后 permission申请失败问题分析//Permission 包使用的API错误 + Context对象错误
+flp 集成后 offline 崩溃问题确认
+
+20170119
+CN20172147技术交底书撰写
+flp test 升级版本，增加nlp状态判断
+flp集成其他相关工作
+性能分享会
+
+20170120
+flp test 升级版本，增加nlp状态判断//已经完成，并自测通过
+flp 主工程自测
+flp主工程代码review 以及问题修复
+
+20170122
+flp auth模块review问题修复
+flp auth模块wiki补齐
+flp crash wiki 补齐
+
+20170123
+重构模块 converity问题修复提交版本
+flp permission 多个权限同时申请，只显示一个问题修复
+flp permission 增加同时申请多个权限的接口
+flp 主工程review
+
+20170124
+flp crash review问题修复
+
+20170206
+case: 高德地图，打开后总是停留在上次定位的位置，过一会儿才同步到当前 //flp返回位置均正确，怀疑amap客户端缓存了上一次GPS位置，客户端人员正在排查。此问题本地无法复现。
+case: 导航时，位置不动，实际上的位置已经离当前位置有2km了 //amap未使用flp，线上amap 无log，因此需要华为通过GPSlog 协助分析问题。
+case: HTC报人在台湾，位置显示在郑州 //NLP海外数据库线下训练算法和大陆不同，导致定位数据库差异，已经手动修正错误位置，但是训练算法未统一
+case: 高德地图 定位不准（新增舆情问题）//一个月前定位日志查不到，服务端拿到相关日志，分析结果是地铁wifi问题，预计三月底解决
+重构flp 测试安排
+
+20170207
+case: nlp跳点过滤问题分析 //连续两个纯基站定位，而且时间小于45s，会被视为定位抖动，过滤掉
+case: 高德地图高负载问题, // cpu使用率过高，联系华为提供 method trace 文件分析问题。
+flp 重构historicalTrack 串讲 QA测试相关问题确认
+
+20170208
+case: com.autonavi.minimap:LBSconnectionservice thread limit //淘宝push 服务异常启动的线程过多造成的，802版本已经将此包下线。
+case: nlp跳点过滤问题分析 //答复客户疑问
+case: 高德地图SDK在海外无地图显示 //跟踪
+联系买mate9 p9测试手机
+android性能分析工具学习
+重构: historicalTrack  测试过程中协助QA 设计测试case，分析测试demo开发问题等等。
+
+20170209
+历史轨迹 DR 测试用例评审
+历史轨迹：协助测试解决测试demo的问题
+历史轨迹：修改测试评审中发现的问题并提交新版本
+
+20170210
+historicalTrack：协助QA测试
+case: qualcomm 报flp1.6.3在 sdk23 设备上不能拿到nlp位置查看权限发现没有任何权限 //1.6.3上没有动态权限检查模块，需要替换成1.8.x或者更新版本。
+case: flp 一晚上耗电60M  //NLP 死循环不停的访问网络
+
+20170213
+historicalTrack测试demo协助分析
+historicalTrack QA反馈case分析解决(6个，4个华为rom问题，1个测试流程不规范，1个已经修改)
+AR串讲
+
+20170214
+ODPS 串讲会议
+historicalTrack QA反馈case分析解决(新增2个，1个无法复线，1个已经修改)
+
+20170215 
+historicalTrack QA反馈case分析解决 (已经全部有结论)
+DR测试问题协助分析
+case: 高铁开到泰安，在车站停下的时候，看见高德地图的定位飘来飘去好几次 //先走cache定位，后来走在线定位，导致小范围的跳点。cache定位时，每20s强制走一次网络请求来更新cache，现在cache使用策略设计如此，产品考虑要不要更新cache策略
+case: 华为运动健康 疑问，解答跟踪， //由开放平台给出回复
+
+20170216
+DR测试，mate8上pdr概率绑定失败  //flp 被省电模式杀死，关闭系统省电模式后解决
+DR测试, mate8 pdr上报 update接口不起作用 //确认是手机rom问题
+fused engine review 
+采购手机制式错误，联系处理解决方案。
+
+20170217
+flp 主工程采集反馈模块梳理
+
+20170220
+AR fusedengine 测试用例评审
+采集反馈模块，架构梳理
+NLP 重构工作梳理以及分配
+
+20170221
+NLP Samsung新需求：将meta data中定义的serviceVersion修改为 10001 并编译发包。
+采集模块，老版和重构版差异比较整理，准备评审文档
+反馈模块，流程以及代码梳理
+联系刷手机
+
+20170222
+flp 采集模块，集成完成，还有一些需求细节需要和产品商定
+NLP 采集接入问题梳理
+反馈模块接口基本逻辑梳理完成，定位sdk集成方法梳理完成，flp具体需求 需要和产品商定
+NLP dumpcrash 问题梳理修复
+联系刷手机
+
+20170223
+FLP NLP采集需求讨论会
+低功耗导航，协助预装团队排查，围栏下发不成功问题 //客户端问题导致
+FLP NLP采集模块接入完成 //等待采集测试完成后 正式上线
+
+20170224
+华为刷手机rom
+
+20170227
+IOS定位技术分享会
+flp和 NLP 主工程 dumpcrash crash时log增加lastlocation
+flp 主工程升级版本，编译问题整理
+MHA 导航时ipl不开启 //flp 被系统杀死，导致ipl命令丢失，手机配置锁屏不杀flp并且flp开机启动
+flp主工程预装窗口crash bug //子模块依赖版本不一致，访问的方法存在导致crash。修改子模块依赖后修复 
+
+20170228
+坐标插件转换进度梳理
+FLP NLP反馈需求确认
+
+20170301
+NLP反馈接入 //已经完成
+坐标插件华为沟通会  //确认开发进度和现有问题。
+插件转换技术问题讨论：
+  1. 插件文件加密: 高德提供，方式为：文件末尾追加一个字段，来验证文件的完整性。
+  2. 由于onDiagnosticDataAvailable 接口方式google已经放弃，因此flp通信方式需要修改：尽量采用通用的方式（通过flpsdk 或者 ContentProvider等等）
+
+20170302
+FLP NLP apk文档增加 采集wiki
+NLP 反馈增加定位失败次数统计
+NLP 中兴去掉定制弹窗  //已经修改、编译、自测、发版
+坐标插件转换，问题追踪答复
+  
+20170303 
+坐标插件问题追踪 
+  1.需要准备编译系统和环境(xp电脑，虚拟机付费，linux系统)
+  2.之前与硬件联通的Diagnostic接口废掉了，新方式还需要讨论。
+flp sdk增加geofence调用方式说明wiki
+
+20170306
+flp apk 新老版本性能对比测试 测试环境准备，//Android studio初步对比无太大差别，详细的需要QA提供一下测试工具源码，修改后测试
+flp apk QA代码串讲测试问题解决
+
+20170307
+Emmagee 测试工具代码修改，使其支持 service性能测试 //已经完成并且测试
+Android N 获取app pid方式研究 //已经被 selinux 关闭，暂时没有办法自动获取
+AR PDR算法分享
+flp apk 重构前后性能对比 //已经初步完成，细节进一步测试
+	//内存，debug版与重构前基本相同，release版优于重构前
+	//CPU，debug版明显高于重构前， release版与重构前release基本相同
+	//总体来讲，重构release版明显优于重构debug版，说明trace对于性能的影响非常明显
+
+20170308
+flp 重构后性能测试 //已经完成。
+flp apk 测试用例评审
+
+20170309
+和法务讨论 坐标插件 保护相关的情况 //已经讲明工作原理，并给出类似专利，法务评估决定对于坐标插件重新申请一个专利，并且尽快提交，以保护我们产权
+flp sdk extraCommand增加保存导航命令的功能 //已经完成
+一加 高德地图刚打开系统无GPS定位图标问题 //一加使用1.7.0的flp， 此版本厂商配置错误，FLP默认不使用GPS，导致此问题，建议一加升级FLP版本。
+
+20170310
+坐标插件专利技术交底书撰写 //已经交由法务初步审查
+PDR分享会
+NLP apk代码review
+flp nlp apk增加网络定位埋点。 //经讨论必须接806版的埋点，上线有风险。
+
+20170313
+崩溃平台更新，和建挺沟通新的配置项和配置方法，并写入wiki //已经完成
+崩溃平台更新，不能显示flp的crash //正在与服务端同学沟通，预计明天解决
+重构bug：
+  [FLP apk]Framework与SDK交叉调用与移除，出现连续启动-》崩溃 //flp fusedengine NLP跳点被过滤掉以后，没有增加null判断，因此崩溃，已经修复
+  [FLP apk]采集崩溃 //去掉collectorConfig.mapkey = null; 这一行配置后解决，同时采集模块也做了防错处理
+  [FLP_SDK]正常定位过程中，一直报异常，找不到 HWFLPLocationManager //重构后相比于重构前，少了HWJNIFLPLocation.jar 库 ，flp_dr 增加此库以后解决。
+  [FLP_SDK]偶现request的时候没有位置返回 //由于采集崩溃导致的flp定位停止，和flp采集崩溃 一起解决
+
+20170314
+【FLP-APK】用定位SDK的demo测试的时候，每次进行网络请求的时候都会有权限确认的弹框 // 已经和产品讨论好需求，待开发。
+【FLP-APK】flp 2分钟无位置返回 //手机链接wifi，从系统读到的wifi list为空，我们的策略是，有wifi链接的情况下，五分钟扫一次wifi，中间有5分钟之内没扫描，所以没位置返回。
+崩溃平台不显示flp的log //flp 版本号过长，被过滤掉，我们减少版本号长度。
+和法务讨论，坐标插件保护 相关事宜。
+
+20170315
+首次定位测试demo，开发修改 //已经完成
+permission 弹窗，新需求开发 // 完成80% ，需要产品确认文字描述
+flp sdk 多线程访问，在没有鉴权成功情况下就会下发命令 //已经加保护锁修复
+QA测试问题协助处理
+
+20170316
+flp sdk Service destory 造成exception问题修复 //改到application里面初始化
+flp navi模式 代码梳理修改 //完成
+flp apk 生命周期管理不对 //已经修复几个有可能泄漏的地方，其他问题待进一步分析
+QA测试问题协助处理
+
+20170317
+flp crash 更新保存策略  //已经完成
+flp apk 生命周期管理相关bug 分析解决 //已经完成
+偶现异常：IFusedLocationCallback$Stub$Proxy@e4005f5 is dead //生命周期管理问题导致，已经解决
+
+20170320
+flp converity代码扫描问题修改 //已经完成
+
+20170321
+converity 代码review 以及问题修复
+
+20170322
+flp apk增加debugNoProguard 编译类型 //已完成
+
+20170323
+flp apk 首次安装内存消耗明显高于第二次启动问题 //首次启动有系统弹窗，加载资源多消耗内存
+debugNoProguard没有test 界面不启动问题 // 增加buildtype以后，test包需要单独增加到编译类型里面，增加后解决
+
+20170324
+华为安全测试问题分析 // 10%
+服务端定位技术分享
+
+20170327
+重启手机后，链接网络仍出现定位失败无法规划路线 分析修复自测发版 // 老版本flpbug导致，已经修改flp sdk并发版。
+华为安全测试问题分析 // 50%
+
+
+20170328
+华为安全测试问题分析 // 80% 等待产品评估风险后修改
+
+20170329
+showdemo 不显示地图问题 //已经替换成最新的地图sdk
+切换用户，又切换回来后，showdemo定位停止问题 // 切换用户，又切回来以后，showdemo所有activity都destory后重新create，创建了新的监听对象，需要重新下发请求
+
+20170330
+切换用户后，又切换回来，showdemo下发请求没有位置回报 //切换回来后activity重新create，没有按照顺序执行，导致初始化时序错误，//已经修复
+flp apk cancle 接口实现
+NLP需求,Samsung 新需求修改并发包 //已经完成
+NLP foxconn 新需求，修改并发包。
+
+20170331
+重构后flp功耗比重构前高问题分析 //已经验证是wifi扫描变快导致的。
+
+20170405
+flp重构需求接入,nlp网络请求url中增加 调用者包名和版本号字段 // 已经完成
+
+
+20170420
+新工作内容熟悉
+amap 主工程编译环境搭建 以及编译 //已经完成
+amap 代码熟悉了解 //通过文档基本了解amap整体架构，需要进一步了解common模块代码细节
+
+20170421
+common模块细节了解
+common模块渲染引擎适配层部分代码逻辑梳理//已经对要做的工作有了比较具体的了解，分析明确一部分代码问题，准备进一步开展后续工作
+
+20170424
+1.渲染引擎适配层：调用接口相关逻辑缕清，问题确认，修改方案确认
+2.渲染引擎适配层：事件回调相关逻辑缕清，问题确认，修改方案确认
+3.渲染引擎适配层修改方案讨论确认。
+
+20170425
+mapContainer 逻辑梳理 30%//跟业务强相关，不知道需求，看代码比较吃力，最好有熟悉的人串一下代码
+
+20170426
+mapContainer 逻辑梳理50%
+
+20170427
+mapContainer 逻辑梳理70%
+
+20170428
+mapContainer 逻辑梳理100%
+mapContainer 梳理问题讨论，以及解决方案初步沟通
+
+20170502
+overlayManager 逻辑梳理，便于拆分
+
+20170503
+mapContainer 逻辑拆分，具体落地讨论确认
+新旧版主图逻辑确认，拆MapContainer逻辑时避免重复劳动。
+
+20170504
+新旧主图逻辑梳理，拆MapContainer逻辑时避免重复劳动。
+810落地计划讨论
+
+20170505
+引擎册GLMapView接口修改，确认影响以及落地方式
+amap启动代码学习
+
+20170508
+feed流不跟随软键盘的bug，梳理代码流程，增加log确认问题，并且反馈给动态UI同学
+
+20170509
+feed流不跟随软键盘的bug，协调动态UI同学分析解决 //
+主图模块化代码梳理
+
+20170510
+主图模块化 main operation common 三模块编译成功，但是会崩溃，进一步梳理amap启动流程
+
+20170511
+主图模块化 main operation common 三模块编译成apk，解决所有崩溃 //所有崩溃都是由cc.getservice引起的
+jni编译工程搭建
+
+20170512
+主图模块化 解决模块互相依赖，route driver 模块（已经和 route 和聪启沟通，等待他们解决）
+ak环境搭建 提交代码
+
+20170515
+810：
+  mapContainer 拆分:跟广杰沟通开发计划以及问题 //预计本周 已经完成
+  渲染引擎删除接口：跟相关同学沟通确认相关问题  //引擎删除4个接口，代码提交后，客户端随后修改合并 //和 screenshot一起修改
+  screenshot 拆分开发合入 feature/810/newPagesFramework //需要跟 dijiayi对一下 com.autonavi.map.util.MapViewScreenshot 的区别，能不能保留一个
+主图模块化：search offline life 耦合接口梳理，并且跟聪启沟通，各解决方案
+主图模块化：修改切换主图样式时崩溃的bug
+
+20170516
+810：
+  渲染引擎删除接口：客户端代码已经修改，并且提交
+  screenshot拆分，合入 feature/810/newPagesFramework //跟相关业务已经沟通MapViewScreenshot 和 Mapcontainer截图相关逻辑重复可以合并成一个，合并后的类提供两个方法：只截底图、底图view一起截。Mapcontainer保证兼容性接口保留但是实现转到新接口，MapViewScreenshot已经协调各个业务810会修改到新接口。
+主图模块化：接口整理方案已经跟聪启沟通确认
+
+20170517
+主图模块化：接口修改方案确认，修改各个模块接口 // 修改互相调用问题17个，剩余5 等聪启解决
+
+20170518:
+主图模块化: 分支代码提交完成，等到聪启解决完其他问题以后，要推各个模块把接口挪到相应的jar包里面
+accs 接入代码梳理
+screenshot修改相关：找各个业务人员对一下是否修改.
+
+20170519:
+JNI代码梳理
+screenshot 执行情况追踪
+
+20170522
+模块化：
+1.时间收益摸底
+  编译时间对比：通过点击studiorun按钮进行操作(三次取平均值)
+    release/808分支 -> 模块化分支(仅保留common main operation三个模块)：
+    完全build时间：7:55 -> 4:28
+    完全clean时间：32   -> 20.4
+2.修改代码统计：详见 问题统计.txt
+3. operation模块化问题统计
+
+20170523
+模块化：所有模块，模块化问题统计：
+ operation:在common main operation三个模块的基础上，去掉operation，仅保留common main两个模块，代码耦合20个，资源耦合6个
+ route:在common main基础上增加route模块，无耦合问题，有CC.getService判空问题
+ drive:在common main基础上增加drive模块，无耦合问题，有CC.getService判空问题
+ search:在common main基础上增加search模块，无耦合问题，有CC.getService判空问题
+ offline:在common main基础上增加offline模块，无耦合问题，有CC.getService判空问题
+ life：在common main基础上增加life模块，无耦合问题，有CC.getService判空问题
+ 
+810开发进度追踪：(全部完成)
+   1. mapContainer楼层控件和景区控件拆分：已经完成
+   2.screenshot 接口修改
+     MapScreenshotPresenter：广杰 已经修改完 1处
+     SelectFixPoiFromMapPage：杨涛 已经修改完 1处
+     FootNaviViewDisplay：仇俊辉 已经修改完 1处
+     DestNaviViewDisplay：杨涛 已经修改完 1处
+   3. 渲染引擎删除接口: 已经完成
+
+20170524
+模块化：
+  主图模块化： 聪启待解决1个 ，范哲铭待解决1个
+  operation模块化：解决资源耦合问题(7处涉及代码7行)
+  解决getAccount为空问题：在debug版本编译时候，如果getAccount()为空的话，直接new一个account返回，保证不为空，release版本仍然采用原有方案
+
+20170525
+模块化：
+  解决DES耦合问题
+    经梳理发现，operation提供了两个功能相同的类，删掉其中一个，并将另外一个移到common里面，以解除耦合 //已经解决
+    涉及改动:删除一个类，移动一个类 
+    operation: https://aone.alibaba-inc.com/code/D191101 
+    common:https://aone.alibaba-inc.com/code/D191105
+  模块化route模块单独编译崩溃问题解决，共增加判空59处， 另外route模块目的地输入依赖于drive模块，因此两个模块会互相耦合
+  
+20170526：
+模块化：
+  route模块化测试，发现
+    通过CC或者startpage耦合:(仅包含明显可)
+      route模块drive模块耦合:目的地输入框调用drive的page,单独route模块，不能输入目的地。
+      route模块drive模块耦合:开始跑步功能调用drive的语音功能，单独route模块，语音功能不好用
+  drive:
+    无直接耦合问题，有CC.getService判空问题共83处，见route/0001-cc.getService-null.patch  //已经解决
+    drive模块无单独入口，依赖于route、search等模块才能启动，因此无法单独工作。
+	
+20170605:
+模块化：进度追踪
+    主图模块化剩余两个问题：
+	1. instanceof 由杨超解决 810上线前
+	2. 公交问题，由范哲铭解决，6月底之前
+	
+20170606
+  drive 调用route模块耦合代码排查 //目前发现2个类 21处调用
+  
+20170607  
+ 调用route模块耦合代码排查
+ 
+20170608
+  CC优化项追踪，追踪进度。
+  
+20170609
+  耦合问题梳理，以及解决方案讨论
+  //业务解耦：详细问题分析。
+  //接口解耦：提供mock 功能 sp提供写入功能
+  IOS端问题讨论
+  bug：
+   上报功能，截图功能导致OOM问题。 //相关人员仔细分析后，是由于反复登陆造成的系统内存占用过多，此时使用了上报功能，加载截图导致了OOM，问题出在反复登陆上。经仔细研究截图功能，发现在1920*1080的手机上，截图有300K+，有一定的优化空间，后续需要跟产品对一下，更低分辨率，更低质量图片是否能够满足需求。
+
+20170612
+  合入812以后代码测试，修复问题
+  mockservice 需要统计返回值的类型，不能简单的如果是类就返回null，不然像String这种类型会造成特别多的 崩溃
+  
+20170613
+  主图模块化合入812分支，测试并提交，发现新增两个代码耦合问题。未发现崩溃问题 //已经解决
+  跟ios端对详细的mockservice方案。
+  
+20170614
+  聪启对一下模块化落地的具体方式，具体计划
+  制定一个进度
+  跟建挺对一下如何去做，如何去实现 。对一下上线时间。 //816没问题
+  公交和驾车 还有seach  operation的耦合解决方案。   //驾车确认方案没问题
+  
+20170615
+  routeline耦合方案梳理，//基本可以确认修改方案，但是和公交同学对一下以后，发现有很多逻辑已经改成了动态UI实现，因此后续需要重新规划解耦方案。确认可以修改放到common
+  
+  
+20170619
+  mockService 各个模块单独编译运行。 (common main)
+  
+20170620
+  mockService 各个模块单独编译运行 (operation drive)
+  各个模块负责人推动,组件化方案。
+  统计816 组件化需求方案 
+  
+20170621
+  mockService 各个模块单独编译运行 (route)
+  整理各个夸模块调用的service 。  
+  
+20170622
+  816需求确认
+  route 栏组件化方案影响确认。
+
+20170623
+  jsAction 解耦方案确认。
+  
+20170626
+ release/812检查模块化代码修改，以免出现问题。
+  问题：release/812，合并以后，又带来了代码直接依赖， 希望在编译或者findbugs来自动提示错误。
+  问题：模块化由于疏忽多加了一个判空，会导致service不能初始化，正常功能不能运行，以后多review 以免出现同样的问题。
+  
+  1.以前遗留的2个问题未解决， //instanceof已经解决，哲明那个等待解决
+  2.后来县长又引入了新问题未解决
+  3.共享单车IntentController问题未解决  //已经解决
+  4.StartProcessImpl  checkorder //已经解决
+  5.DefaultPresenter com.autonavi.map.nearbytips.NearbyTipsManager //挪到common或者增加接口  没用，可以下线  确认一下
+                      com.autonavi.mine.page.MineManager.onQRActivityResult()//static方法 增加接口获取  确认一下  聪启删除 a21dddc
+  
+  
+20170627
+  jsAction相关代码梳理，梳理清楚属于哪个业务，然后跟各个业务区对一下是否准确，以及落地方案
+  
+20170628
+  jsActiong确认，不能单独分别出属于哪个业务，因此暂时挪到单独文件夹中，最终可以达成jar包或者小组件
+  
+20170629
+  life offline 增加null判断，单独编译。(offline 当做小组件，只有设置和feed流有入口，不考虑入口问题)
+  驾车需求串讲会。
+  
+20170630
+  atlas 调研
+  底层中间件 + 小组件
+  每个组件像一个单独的APK，有自己的asset、dex、资源和so
+  底层runtime提供版本管理，清单管理，代理（按需加载）
+  组件之间的依赖，可以自动完成，生成配置文件下发到APK
+  动态运行存在几个问题：dex 解释，资源及时so动态加载
+  动态更新：可以下发各个小组件的diff，然后动态替换部分二进制字节码	
+  思考： 组件依赖自动扫描并完成。
+         各个组件动态加载运行
+  代码不分为多个工程，而是一个工程多个project
+  
+
+  
+  20170704
+  驾车需求串讲
+  
+  20170705
+  模块化：合并最新代码，并review，单独编译测试
+   common组件化引入新的模块间耦合 7处 由聪启解决
+   1. main 耦合operation：IShareDialog IShareDialogManager，FeedbackManager
+   2. main 耦合 drive： TaxiStatusPollingManager，IRouteUtil
+   
+   IntentController 耦合
+   com.autonavi.minimap.route.inter.IRouteUtil   范哲铭    OK
+   com.autonavi.minimap.splashpic.manager.SplashManager 县长  OK
+   
+   NewMapActivity 耦合
+   com.autonavi.common.share.IShareDialog;    县长   OK
+   com.autonavi.common.share.IShareDialogManager;  县长  OK 
+   
+   StartProcessImpl 耦合
+   com.autonavi.minimap.ajx3.modules.JsOfflineAuiService; 许峰 OK
+   com.autonavi.minimap.ajx3.modules.JsOfflineAutoService;  许峰 OK
+   com.autonavi.minimap.ajx3.modules.ModuleAlipayFreepay;  许峰 OK
+   com.autonavi.minimap.ajx3.modules.ModuleCloudConfig;  孙波  OK
+   com.autonavi.minimap.ajx3.modules.ModuleMessageBox; 许峰
+   
+   DIYMainMapWidgetManager耦合
+   com.autonavi.mine.feedbackv2.base.FeedbackManager zengpeng.cp
+   
+   AmapActionBroadcastReceiver 耦合
+   com.autonavi.minimap.route.inter.IRouteUti   范哲铭   OK
+   
+  20170710
+  代码review
+  组件化自动扫描：
+  依赖一共有5种 
+		类直接依赖  //import 可以搞定
+		interface非反射  //import 可以搞定
+		interface反射   //startService方式，拼字符串和读文件可以搞定
+		startpage  读文件可以搞定
+		其他注解   读文件可以搞定
+		sp：    暂时不考虑吧。
+		
+  20170711
+  模块化:组织各个业务代码review，推动他们合入release/816开发用 //已经合入文华components分支
+  组件化自动扫描，import相关已经可以生成图片，还差cc.getService和 其他注解方式
+  
+  
+20170713
+816/components合并模块化分支,解决耦合问题
+代码已经合入 816/components 分支，后续业务开发可以从此分支上拉取代码
+common ： https://aone.alibaba-inc.com/code/D229444
+main:  https://aone.alibaba-inc.com/code/D229458
+offline：https://aone.alibaba-inc.com/code/D229465
+operation:https://aone.alibaba-inc.com/code/D229474
+
+
+20170714
+playground 先搭框架，818之前找guoyue 把调研的扫码工具都放到playground里面，供QA测试， 需求方：lijiayu。  
+playground已经搞定，但是 扫码还需要再搞一下
+main: https://aone.alibaba-inc.com/code/D230407
+根工程：https://aone.alibaba-inc.com/code/D230408
+playground： gitlab.alibaba-inc.com:amap_android_rd/amap_module_playground.git
+
+20170717
+class文件 获取方法调用参数 确认问题
+排除某些类和包已经完成
+
+20170718
+代码review 
+android8.0 页面不刷新问题
+
+service可以搞定。
+page
+startPage 参数问题。 不搞了， 太复杂
+1. startpage 是一个基类，派生类太多， 不好确认
+2. startPage参数获取方式太多，ldc、ldc_w、dup、invoke等等
+Dialog 只有common 在用 跟page类似，但是没人使用。
+
+
+jsAction只有common在用 ，ajx和webView在用
+MainMapFeature 只有main在用 ，涉及到一些事件的分发。（返回、全屏、sharkManager、alicarManager）
+multiPleService只有main在用 ， ajx调用java注册用的
+
+20170719
+自动扫描：已经完成配置文件，还差 分成组件扫描
+带虹桥 反应问题： 组件化以后是红的；
+主图组件化：ajx培训推后，导致816不能开发，818开始做。
+
+20170720
+组件化扫描完成最终的几个问题。
+
+20170721
+组件化扫描完成 深度优先搜索算法。
+组件化扫描上线并发送邮件。
+
+20170724
+组件化扫描，完善邮件发送最后的问题（字体颜色，格式，内容错误等等）
+模块化组件化PPT
+主图又发现耦合问题， 预计这周由段晓东 这周内解决(@聪启)
+
+主图跟进：
+做了车主服务(ajx) 云同步（聪启） offlinesdk，msgBox（平台）聪启给新规划
+搜索跟进：
+方案已经确认，李彬团队正在写接口适配层代码，auto正在搭建 mac编译环境，李彬团队下一步工作依赖于auto的进度，他们周三会对进度，周三再对一下
+https://lark.alipay.com/ep7g0n/osuxh2/dlbf7i
+
+20170725
+模块化发现新问题：
+1. 云同步 so位置不对，导致模块化崩溃
+2. 微博登陆 导致 main耦合operation
+3. 模块化 一直卡在splash界面。
+ppt整理以及模块化测试
+
+20170726
+分享ppt整理，review，以及修改
+组件化扫描wiki整理
+812代码修改梳理，发现一个未解决的问题。
+  MainIntentDispatcher
+  com.autonavi.map.search.fragment.SearchResultMapPage;
+ 
+20170727
+ppt整理以及review 
+maven仓库整理
+
+20170728
+解决一下mainIntenDispatcher的问题。
+common： https://aone.alibaba-inc.com/code/D242172
+main：https://aone.alibaba-inc.com/code/D242175
+search:https://aone.alibaba-inc.com/code/D242177
+
+mockService throw exception
+
+
+
+20170731
+问题讨论：
+ 1. 模块化，组件化落地点和落地方案 
+  mac freeline编译都很快。
+ (开发->自测->QA->上线->bug)
+ 
+   1. 模块化： 每个模块对外的jar包自己管理，不再往common里放。同时开放getService以外的挎包访问方式。
+   2. 通过后缀名，自动导出jar包
+     (Windows编译慢，解bug、性能测试）
+	 
+	 将jar包版本放到 versionmanager 里面
+
+ 2. 推动大家使用。
+	收集痛点问题。
+	
+ 3. check 工具在gradle 工程上落地。
+    1.java 1.7支持
+	2. 多线程，降低编译时间
+	3. 多测试保证不影响正常流程。
+	
+	只扫描main模块
+	
+20170801
+扫描工具 java1.7 适配 已经完成
+扫描工具 优化log显示
+扫描工具  多线程适配，加快扫描速度
+扫描工具 适配到本地	
+
+20170802
+interface 放入单独目录下导出，这个可行。
+resource 解决方案还有待商定  （志浩：资源管理平台）
+ 1. 资源不好找
+ 2. 资源重复  可以通过md5来判断图片重复
+资源统一管理 ，我们可以提供工具去检查重复资源，浏览图片。 资源混淆，资源名字很长，可以用来减小apk大小
+confluence 文档 催他们交
+关键代码扫描落地跟进
+
+20170803
+组件化扫描落地到Jenkins
+平台支撑优化项收集
+主图818优化项：
+  车主服务 （ajx）
+  账户模块
+  收藏夹
+  云控配置
+  分享
+
+20170804
+安全问题排查
+818添加export目录
+defaultAccount 加个注释，抛个异常 ，再想想怎么仅在模块化编译时返回defaultAccount 
+资源问题：https://www.atatech.org/articles/87376/?flag_data_from=mail_daily_recommend&uid=155544
+
+20170807
+apk包减小：跟郭悦讨论，我们初步从图片的角度去处理这个问题，去掉重复和无用的图片资源，字符串以及 资源名proguard暂时不考虑
+安全问题讨论：818先梳理敏感信息， 迁移sdcard->data, 特别敏感信息加密
+
+20170808
+基础地图需求串讲
+安全问题 最终方案确认
+  db 采用sqlcipher
+  kv 采用levelDB
+  file 自己写
+levelDB 和sqlcipher 调研
+
+20170809
+levelDB 编译打包，写demo，测试性能
+sqlcipher 最终的版本以及升级 方案确认
+common优化项，基础地图没有排到需求里面去
+
+20170810
+安全问题，最终方案讨论确认
+组织大家串讲各自工作
+
+
+sqlcipher加密现有数据库耗时，不随着数据库大小提升而提升，因此迁移方案为，当数据库初始化时候，一次性进行加密。由于sqlcipher
+在android上稳定性未知，因此保留两种方案，当sqlcipher不可用时，沿用原有方案工作。
+
+kv存储，想暂时采用，对kv加密，然后用sp存储的方案，这样有一个问题，kv加密以后都返回的都是byte数组的数据，而sp不支持数据保存，因此
+采用将kv 进行base64，在进行保存。 后续测试一下，sp的加密迁移时间，时间短的话，可以文件一起迁移，时间长考虑逐条迁移。
+
+文件存储，确认采用自己去实现， 自己定义文件格式以及加密方法，加密key，封装jni，对大家提供我们自己封装的接口。接口已经定义完成，
+后续拉大家review。
+
+20170811
+文件和 kv存储 接口确认，准备拉大家review
+leveldb crash时 需不需要sync问题确认
+郭悦反应 网络库 cookie重复问题，同步到组内去追踪
+安全问题 amap_configer.data 删除测网地址
+
+20170815
+安全问题：确认对外接口，和C层的接口，并开发20%
+安全问题：迁移方案讨论
+
+20170816
+安全问题：迁移方案讨论
+安全问题：c层开发 40%
+
+20170817
+安全问题开发： 60%  接口已经完成，安全问题讨论
+问题：多线程统一迁移，加锁的问题。
+讨论结论：sp 确认方案，数据库用事务方式进行，文件没有特别敏感的数据，此版本暂时不上。
+
+20170818
+1. 文件加密实现，文件加密，文件操作已经完成，jni封装，java封装调试可用。 路径是否加密以及方案，还需要讨论。
+2. 对外加密接口确认。
+
+20170821
+文件加密java层开发完成，并测试修正问题（基本功能测试，快速读写结果测试）
+ 1. read、seek、tell、getc、putc 返回值问题修正
+ 2. c层使用fwrite fread 导致和系统接口 操作结果不同，自己调用flush解决
+
+20170822
+文件加密除了路径加密，其余均已完成。  经过讨论，文件加密818不上，暂停所有开发。
+1. 性能对比测试
+2. 多线程对比测试
+剩余文件路径是否要加密。
+
+安卓安全考试
+
+20170823
+拆common剩余工作
+ 1. 梳理各个业务的逻辑
+ 2. 老主图代码删除
+ 3. 共有代码逻辑处理
+ 4. 资源平台化
+
+ 荷花池排期问题,已经搞定
+ 
+20170824
+ 1. 梳理各个业务的逻辑（跟晓婷一起梳理）
+ 2. 老主图代码删除 (找基础地图的人来处理，同时整理mapcontainer)
+ 3. 共有代码逻辑处理（代码分类）
+ 4. jar包版本管理放到versionManager
+ 4. 资源平台化 (后续讨论)
+ 
+ 
+20170825：
+协调基础地图测试项
+公共代码整理
+
+ 
+20170828
+生命周期回调讨论
+
+20170829
+export 基本类型
+1. 业务接口
+2. 可拆分成组件
+3. 公共业务，由我们维护
+4. 共用逻辑，但是好多人维护的，比如overlay，push
+5. 共用类，多业务使用，但是没有抽象成接口
+6. util可以拆分
+收集common优化项，提供给基础地图排期
+
+20170830
+export优化项推动
+export 代码梳理，70%
+check 818组件化开发，解除耦合
+
+20170831
+export总体有多少项已经梳理完成，有一个初步的list，但是还有大约30%的业务不知道是哪个业务。
+后续: 
+  跟业务确认未知项数据哪个业务
+  跟业务一同梳理现有项如何下沉
+  确认下沉项排期
+优化项跟进确认业务已经全部排进需求list，等需求串讲后确认最终落地项
+
+20170904
+各个业务串讲
+leveldb 适配到amap
+export接口梳理
+
+20170906
+leveldb 适配到amap
+1. 修改demo工程jni层内存泄漏问题2处
+    java层对象被自动回收以后，没有通知jni层delete内存：重载系统finalize ，当内存回收的时候通知jni delete内存
+	jni层调用GetByteArrayElements以后，没有release，造成java层对象不能被回收：调用ReleaseByteArrayElements，释放引用计数
+2. demo工程占用内存13M原因确认 
+	leveldb默认的cache和write buffer比较大造成的，考虑到我们使用场景，并没有很大的数据量，但是对内存比较敏感，因此后续适当缩小cache和buffer
+3. jni增加debug和release编译配置
+   debug模式增加log，出错以后直接抛异常崩溃
+   release模式不打印任何log，出错以后不抛异常，只把错误信息通过log打印出来。
+4. demo工程增加全面的功能测试代码，为移植到amap做准备
+可能存在的问题：
+1. 我们替换MapSharePreference实现方式以后，其他业务如果有调用系统的SharePreference接口的地方，可能会导致读取内容失败，需要特殊注意。
+2. leveldb的使用可能会造成amap内存增长，需要评估是否可行。
+
+20170911
+依赖扫描，根据聪启的要求，增加更详细的log。并且解决耦合问题
+export，跟聪启对了要做的事情。
+leveldb，不支持多进程，多进程的SP 不能使用//经过梳理 push 和 messagebox，multidex使用了多process 不能切换 , 或者提供多process的接口
+
+20170912
+1. 删老主图代码  聪启负责，820删除 [todo]
+2. jar包挪到versionManager里面是否合适
+common 梳理 20%
+
+
+20170913
+Jenkins需求：QA需要自动获取提测包下载的url，需求讨论，并且开发完成，提供给QA使用。
+华为反馈ANR问题跟踪：确认是离线下载造成的，和岳仕杰确认是已知问题，但是修改涉及的影响面比较大，目前正在梳理影响，然后再和产品讨论确定是否要修复
+common 梳理 25%
+协助扫描依赖关系
+
+20170914
+中兴反馈amap占用内存超过300M，经确认这不属于内存异常，自测发现很容易就超过300M，属于正常现象，商务已经回复客户，等待客户答复
+国美反馈772版本高德地图启动崩溃，经分析是通过pluginManager获取 context为空导致崩溃，是已知问题，后续版本已经修复。
+common梳理
+multidex bug协助解决
+
+20170915
+common梳理
+
+20170918
+common梳理 基础地图80%，总体 45%
+
+20170919
+common梳理 基础地图80%，总体 50%
+
+20170920
+崩溃跟进
+common梳理 70%
+
+20170921
+common梳理：70%
+经过讨论，common代码下沉改变策略，梳理好以后，直接拷贝到各个业务的export中，后续再进行排期更新。
+思考：后续工作尽量给业务带来正向收益，更好落地。
+基础地图、驾车、搜索 820会把所有代码拷到业务的export里面，公共出行820 release以后会给出梳理结果，代码暂时不动。
+基础地图：总体梳理进度70% 聪启正在挪
+驾车：业务已经梳理完成，并且已经挪走了一部分，剩余待确认。
+搜索：待梳理，还没有挪。
+公共出行： release/820以后才有时间梳理，挪的话要等到822需求
+
+mapcontainer 造成了很多耦合，基础地图已经在删除老主图代码，并且拆分一些逻辑，拆分完以后，还有剩余的代码，后续看看怎么拆分。
+
+20170925
+common代码下沉
+厂商bug： 【华为厂商反馈问题】从情景智能卡片进入高德导航，高德导航应用卡死
+问题原因：经排查是由于Scheme外部调起Amap，发起路线规划，离线地图会在主线程读取文件，引起ANR导致卡死。
+解决方案：
+  此问题是已知问题由@岳仕杰负责跟进。
+  818临时方案：Scheme分发时先判断离线地图是否初始化完成，如果未初始化完成延迟150ms分发scheme.
+  彻底方案：修改离线数据检查的策略，跟IOS保持一致，没初始化完成返回无效值，由业务去适配，由于涉及的影响范围太大，822作为需求排期。
+
+
+20170926
+common代码下沉
+
+20170927
+common代码下沉
+
+20170928
+common代码下沉
+总体进度：代码下沉基础地图、驾车、搜索已经下沉完成，并且已经合版到release/820。
+下沉list：http://wiki.amap.com/pages/viewpage.action?pageId=15058073
+总计涉及：557个类共71394行
+其中：
+ 删除无用代码：9个类共1117行
+ 基础地图下沉：471个类共59838行
+ 搜索下沉：52个类共7275行
+ 驾车下沉：25个类共3164 行
+ 
+后续安排：
+ 1. 基础地图 822 继续二期，继续拆分代码
+ 2. 驾车语音相关拆组件，需要排期，会给到晓婷跟进排期计划。
+ 3. 搜索已经完成。
+ 4. 公交还需要梳理，我自己梳理，发现只有几个类属于公交。
+ 
+20170930
+厂商bug： 华为反馈，还是离线ANR问题，预计822解决
+组件化扫描工具: 业务使用过程中问题协助解决，并培训开发。
+崩溃跟进： 本周猛犸前台崩溃维持在万分之3-4，无新崩溃出现，情况比较稳定。
+
+20171009
+export业务讨论问题：
+1.老主图代码并没有删干净，基础地图的已经删完了，但是其他业务的还有
+2.新主图的框架放在common里面，应该属于基础地图维护，但都是公用逻辑，暂时留在common了。
+3.jar包版本管理，需要下放到versionManager
+4.文华jar包有很多业务代码，导致业务改代码总是需要找他。
+5.代码里的util类很多，需要整理删除。
+6.很多老业务代码，三不管，暂时留在common里面，后续有人维护的时候再由专人维护，再挪出去。
+7.资源没有挪出去。
+
+
+
+jar包放到versionManager 分类管理
+谁用谁拿走
+
+route这边梳理了一下，只有一个类PageContainer，其他都是weight ， jsAction等等
+
+
+bug：
+小米反馈:使用小米通勤路况，点回家后，打开高德地图无响应，单独打开高德地图，然后在使用通勤路况，则工作正常。
+  原因：分析log是由于，离线地图启动时操作文件IO，导致ANR，是已知问题，反馈给岳仕杰跟进。
+云os反馈:用高德地图导航，有时在导航界面一直不动，有时突然导航的路不对
+  导航问题反馈给张彦超跟进，怀疑是波导手机的问题，已经跟协调厂商手机，复现排查问题。
+  
+20171011  
+GNaviAAR GNaviJNI GBL 关系缕清，并整理架构图。，完成渲染BL层文档建设。
+
+20171012
+LSM
+kv 均是byte数组
+数据以key排序保存（memcmp顺序），不支持自定义
+支持按照range删除操作
+
+支持基于事务的并发模型，支持事务嵌套 (类似于snapshot)
+支持多进程访问同一数据库(单writer，多reader)。
+
+应用程序故障时数据不丢失
+支持range内的iteration(向前或者向后均可)
+提供API，允许外部对数据进行压缩和加密。
+
+单文件存储
+
+leveldb：  
+kv 均是byte数组
+数据以key排序保存，并且支持自定义顺序
+支持batch操作
+支持快照功能，保证数据使用中不受影响
+支持多线程同时读写，不支持多进程
+
+支持iteration(向前或者向后均可)
+支持数据压缩保存
+提供虚拟层，支持快速跨平台移植。
+
+应用程序故障时数据不丢失
+
+文件按层存储，会产生多个文件
+  
+  
+20171013
+819 崩溃跟进 top1 有问题，已经反馈给赵哲跟进，已经修改并已经发patch，其他的崩溃量太少，没有反馈，一会问问志浩是不是有群。
+820 系统崩溃跟进。
+
+老主图代码删除，代码梳理，跟姜9浩讨论，后续需要排期。
+1. 还在使用老主图的按钮，比如drive在使用老的compass GPSController很多业务在用 updateZoomButtonState
+2. 老主图半图半列表 搜索在用
+3. 横竖屏切换
+
+BL文档： 朱强 良榕 喜哥 彦君 盛诚 文盛 曹伟
+
+
+20171016
+厂商bug：【朵唯厂商反馈】地图里截图保存后打开相册跳转至飞猪
+  原因：经排查是由于公交scheme跳转问题，由县长跟进, 820此功能已经下线。
+820 堆乱序崩溃：
+最新结论：  基础地图内存越界造成的， new char[] 写成 new char(),在后续操作中，内存访问越界，堆内存被写坏，最终造成不稳定，到处崩溃。
+一定要有工具化的测试。内存泄漏，内存越界等等
+
+20171018
+文档建设：
+各个业务BL层规划以及完成情况统计， 文档完成时间。
+总体文档完成，预留各个业务文档接口。
+关于文档权限，confluence 上没有权限管理，因此只放总体文档，各个业务细节文档，放到git上。
+
+20171019
+源码目录了解：
+ABTOR ： abtor的一些配置
+build: abtor编译生成的一些文件
+inc：内部头文件
+service:对外暴露的头文件
+src：逻辑实现
+
+文档整理：
+坑
+和沟通gitlab wiki 不能下载doc的问题。(文件不支持中文名)
+和auto人员沟通，渲染引擎设计文档问题。确认文档问题，后续更新时间，以及通知他们文档存放目录。
+和项目沟通文档存放问题。
+
+崩溃：bestor不能访问 问题跟进。
+819.1105 崩溃跟进。
+
+20171020
+BL代码 调试 修改 环境 搭建学习。
+
+20171023
+熟悉渲染引擎BL层代码以及demo代码
+
+20171024
+讨论 amap资源的问题：
+渲染统一管理，但是资源很少，不存在amap的问题
+360资源每个插件管理自己的资源，但是也有公共资源，放在宿主里面，大家都调用
+amap资源：也可以区分，共用资源和组件私有资源。共用资源放到其一，大家都用，组件私有资源放到各个模块下。
+
+渲染引擎bug：
+android amap 模拟导航中崩溃: 崩溃栈 unknown，暂时无法排查问题
+android amap切换后台过会崩溃了: 
+从崩溃的Log上看，崩溃在指针转换上，从代码逻辑上分析，不会出现指针是空的情况。
+与布强确认，在测试时使用的是自己编译的SO，进行了SO的替换，因此导致符号无法正确显示。
+由于目前无法从现有信息上定位问题原因，并且主版没有发现这样的问题，因此暂时对这个问题进行观察，确认后续是否复现。
+根据复现结果再进行确认。
+
+
+common现有问题：
+1.无用代码删除：老主图代码并没有删干净，基础地图的已经删完了，但是其他业务的还有，(需要重构)(动态UI ，BL会下沉一部分代码，需要跟进amap是否删除完成) 
+2.jar包版本管理，需要下放到versionManager
+3.文华jar包拆分(业务代码下放、组件化重构) 以及其他组件化
+4.代码里的util类很多，合并重复、单独用的下放到业务。
+5.很多老业务代码，三不管，暂时留在common里面，后续有人维护的时候再由专人维护，再挪出去。
+6.相同功能代码。jsAction、widget等等
+7.amap资源问题(可以通过工具来扫描资源都有哪些类在调用，然后划分到模块)
+
+
+7.业务组件化以及export拆分。
+
+20171025
+
+ 1.当前所有版本(818和819)的崩溃top榜，
+ 2.每个top问题的占比。
+ 3.和上周对比的情况
+厂商bug
+【金立厂商反馈问题】开启一个导航，下拉通知栏，高德地图图标显示为灰色方块状
+ android N的已知问题，由姜浩跟进。
+ 
+ 
+20171030
+线上崩溃跟进：
+1. SwapBuffer最新进展：已经反馈给华为，华为答复是由libhwaps引起的，EMUI5.X上已经修复，EMUI4.X正在进行修复
+2. libhwaps最近进展：确认和SwapBuffer 是同一个问题，一起解决
+
+文档整理：
+分享会文档上传到wiki
+
+20171031
+Jenkins 偶现${GIT_COMMIT}替换不成功问题排查。
+新版本新添加的bug 页面
+
+渲染引擎分享分享会
+
+厂商bug：
+华为 stackoverflow
+HTC反馈的支付问题
+
+
+20171101
+common 架构讨论以及依赖关系梳理
+线上崩溃跟进
+
+20171102
+堆栈溢出问题排查
+bitmap recycle问题排查
+
+20171103
+合板以后 jar包版本管理 下沉
+各个业务负责人聊了一下，决定觉得分组就可以了。
+
+联系朱强传到 wiki上
+
+
+common:
+common 架构讨论以及依赖关系梳理
+合板以后 jar包版本管理 下沉
+分支管理
+
+BL:
+联系朱强传到 wiki上
+
+线上崩溃跟进：
+Jenkins 偶现${GIT_COMMIT}替换不成功问题排查。
+新版本新添加的bug 页面
+
+华为 stackoverflow
+HTC反馈的支付问题
+
+bitmap recycle问题排查
+堆栈溢出问题排查
+
+
+20171106
+线上崩溃跟进，对一下周报崩溃的格式。
+jar包管理下放
+utils 整理
+整理bestor问题和需求
+ 1. 新增 显示实时崩溃率和前台崩溃率
+ 2. 新增 本版新增崩溃列表页面
+ 3. 新增 可以按照特定时间段筛选top榜(现在只有总top榜和每天top榜)
+ 4. 一键提Aone（可以指定bug负责人）
+ 5. unknow分组崩溃不在top榜里
+ 6. 页面刷新特别慢
+ 7. 老版本数据不能访问，导致bug历史看不到
+ 
+崩溃异常升高
+数据下发新样式，在样式切换时崩溃(仅一次) 
+
+20171107
+崩溃 sqlite崩溃排查
+Jenkins 编译 ajx版本号获取不到 问题排查
+
+common:
+amap-bedstone 基础地图 仅有部分接口
+amap-account  基础地图 仅有部分接口
+amap-adcode	  基础地图 仅有部分接口
+amap-badger   基础地图维护的 全部功能，看能否拆分成无依赖的组件
+
+20171108
+SqliteOpenError 问题讨论排查
+common代码review
+
+
+20171109
+BL开发流程 文档整理。
+common 分支管理
+	1. 发版以后会提交代码。
+	2. 多个版本不需要提升。
+	
+20171110
+中兴外置卡问题：
+BL开发流程文档整理。
+
+20171113
+协助ajx引擎人员，解决ajx model转json的工具（android annotation学习）
+
+20171114
+架构图又一次讨论
+1. 什么代码需要做成jar包
+2. 组织形式，组件代码及其提供的接口 （接口放到一起，实现放到一起，靠包名去区分，有很多业务维护的代码怎么办）
+
+
+20171115
+架构图讨论
+中兴M901C/4.2安装客户端后(默认安装在外置卡），拔掉外置卡，重新启动客户端，进入离线地图无法下载离线数据
+
+20171116
+俊杰代码review
+梳理common代码
+【国美厂商反馈问题】收藏夹添加桌面快捷方式会提示该机型不支持此功能
+
+20171120
+821崩溃跟进： 崩溃跳涨
+GNaviData getRegionInfoByOffset 崩溃：
+崩溃集中同一个用户上，从崩溃栈分析，是在加载global.db时文件内部偏移非法导致；怀疑global.db受到破坏；计划在后续版本增加越界保护，并且新版本的global.db会增加crc校验（目前数据正在测试中）
+
+20171121
+协助彭应亮 编译 playground 
+
+20171122
+协助彭应亮 编译 playground 
+
+20171123
+协助都兴升级msgbox DB。
+协助岳仕杰删除 离线下载错误log保存。
+
+20171124
+common 分类
+common目前代码共 11.4万， 未分类1万。 
+这一期准备下周完成，下一期准备分好的类，去细致整理。（Location sdk、coreMap、mvp、httpsdk）
+
+20171127
+确认上线的目标。
+整理util
+组件化编译支持本地AAR，代红桥 组件化开发支持。
+
+
+20171128
+组件化编译支持本地AAR
+邓伟 解决资源冲突问题
+
+20171129
+整理util
+梁利辉 组件编译问题解决
+代红桥 ，aar包release编译不过问题解决：aar里面R.txt里面含有大量未使用资源，proguard报警导致。加dontwarn 解决
+常见编译问题 文档整理
+扫描插件。
+
+20171130
+整理util
+common现有组件梳理。
+
+20171201
+客户端增加 雨雪动画效果 接口适配
+
+
+20171214
+跟刘坡讨论确认ajx下沉项 828可做哪些？
+跟李彬确认 新建Jenkins job细节问题
+更新代码，现有问题追踪
+825monkey bug，截图时抛出RuntimeException：Canvas: trying to use a recycled bitmap android.graphics.Bitmap崩溃
+ 原因：截图过程中，所要截图的page上有一个imageView 的bitmap已经recycle 导致截图崩溃。log信息不全，暂时无法确认是哪个imageView
+ 处理：崩溃量很少，留作以后观察
+
+20171215
+预装需求，Location-sdk 增加 设置海外定位接口
+
+20171220
+Jenkins job
+崩溃跟进
+spring mvc学习,为即将开始的工作做准备
+
+20171221
+替换dice.so的Jenkins job搭建
+讨论持续集成方面后续工作
+
+20171225
+架构治理：学习架构治理新方案，讨论需求和落地方案细节
+libc debug功能调试，Amap启动时会出现ANR，从log来看是libdice.so加载导致ANR，经排查，基本确认是我们代码和libc_debug 兼容问题导致的，百度和google 都可以用，高德地图806也可以用。
+
+20171226
+libc debug功能调试：进一步排查，逐步注释掉 libdice的方法来缩小范围。
+架构治理：细化整理common剩余工作项以及排期。
+
+20171227
+libc debug功能调试：经排查 增加 c++11 选项就可以通过。
+架构治理：梳理排期，进入下一步的工作。
+bug： htc手机，每次启动，高德地图都提示需要切换sdcard。
+崩溃跟进
+
+
+20180101
+崩溃跟进
+引擎替换dice.so的 Jenkins job 跟titan联调
+持续集成工作讨论
+架构治理：工作细节梳理以及制定
+
+20180102
+Jenkins job titan联调
+http sdk 增加为驾车增加新置项
+
+20180103
+ * 整理详细的排期计划
+ * 参加 bundle设计review
+ * libc_malloc 源码分析，以及debug。
+
+20180104
+* 数据库代码梳理，准备下沉
+* common代码分层整理
+工具：注解支持aar包里面的内容合并。
+
+20180108
+1. common代码分层整理 （周二前完成） 已经完成，并且合入release/828
+
+2. 扫描工具开发接入 （周三前完成）
+3. 各模块详细问题整理 
+  * MapContainer解耦 周二前完成。
+  * 渲染引擎封装层整理 周三前完成。
+  * mvp梳理及讨论，周四前完成。
+4. 需求串讲（预计周五完成）
+5. 静态注册表生成工具开发调试。（本周开始，下周完成）
+
+20180109
+讨论API打包工具
+
+20180110
+分析828驾车ANR
+ 1. 保存log过多，导致，已经减少高频log
+ 
+20180115
+1. 跟俊杰对scm工具具体需求以及大概的实现流程
+2. db问题现状梳理，确认解耦方案
+
+20180116
+1. 讨论基建如何进行质量保证
+2. db解耦文档完成
+
+20180117
+db所有表归属 完成。
+
+20180118
+util类统计
+方案设计
+
+20180119
+
+20180122
+
+20180123
+
+20180124
+
+20180125
+db 和util 设计review完成
+20180126
+db解耦:进度20%
+
+20180129
+db解耦：进度50%
+
+20180130
+DB解耦：进图80%
+
+20180131
+db解耦：删除无用表
+db解耦开发完成，自测，并且文档化完成
+
+20180201
+db代码revert
+util整理
+
+20180202
+周会准备
+调研一下代码静态扫描
+
+20180205
+代码扫描工具接入
+
+20180206
+早会同步一下，bug流转的流程
+静态扫描问题分析
+代码review
+
+20180207
+分支自测
+出分支包
+代码合板
+
+20180208
+本期修改问题整理。bug分析
+
+20180302
+db代码revert完成
+sp梳理完成，开发20%
+Jenkins 临时出包完成
+梳理第一次提测内容
+QA对影响范围
+scm工具代码review
+
+提测影响范围
+循环依赖后续落地方法
+sp解耦
+周报整理以及整体进度整理
+
+855的工作。xxx
+
+
+20180408
+836线上崩溃
+836用户反馈问题跟进
+orca 效能平台填写
+文档规划梳理
+基础库规划梳理
+
+20180410
+base_components代码整理
+
+20180411
+ae adcode Location 之间解耦
+文档下周规划
+serverkey So加载用isInternalPackage来判断
+
+20180529
+小程序性能问题
+1. java内存和native内存增长原因基本确认，是由于小程序引入导致的，无法优化
+2. cpu增长是有一个渲染导致的，本地未复现
+
+
+陈新星同学手机 无限崩溃
+线上发送到车机崩溃
+
+865需求：
+账号： 陈浩、蒋兰、郭晓、李建章
+账号需求串讲
+
+
+20180604
+account 代码熟悉
+ajx环境搭建以及js熟悉，已经搭建了demo
+account 需求初步串讲设计
+860 bug 分析 
+
+20180612
+bug:
+back键退后台后，再回来，微博登陆不成功
+860性能分析
+账号设计review
+
+20180619
+账号开发：
+梳理所有网络请求 10%
+bundle owner：确认排期计划以及backup IOS成员
+
+路况： 蒋澜、郭晓  或者晓林
+钱包： 郭晓
+车主服务： 已经ajx
+
+确定所有排期：20号
+代码梳理、设计方案：7月30号之前
+编码实现：8月30号之前
+代码review：9月30日之前
+
+20180626
+
+新增：
+* 申诉
+* 注销
+* 支付宝授权管理
+* 初始化密码
+* 账号注销权益说明
+* 获取账号三方绑定 信息
+
+更改：
+个人信息修改
+手机号绑定
+手机号解绑
+
+
+
+20180705
+代码review以及问题修复
+网络请求服务端联调 以及问题修复
+数据保存逻辑梳理，以及编码实现
+提供用户信息页接口
+登陆细节流程确认
+ lastLogin逻辑xx
+ 首次登陆信息绑定手机号确认
+ 绑定免密账号又解绑手机逻辑处理
+
+
+
+
+5月份：
+内部技改做什么？？
+1. 新员工收集问题
+2. 技改同学收集能做的事情
+3. 各个业务线leader
+4. 问卷
+5. bug分析
+6. 复盘资料。
+7. 招人： 公众号作者。
+
+对外接口
+Native界面
+ajx
+Eyrie
+网络请求
+数据存储
+log
+减少bug。
+自定义的代码扫描
+减少public方法
+
+删除无用代码
+
+
+框架落地。
+基础仓库
+文档
+工具AB方案保证
+
+解决业务线的问题：
+ * 
+ * 
+ * 
+
+解决老大关心的问题： 
+ * 业务线bug太多
+ * 跟版
+ * 发版流程加速
+
+
+835需求
+虚拟化
+ 1. 主图按钮，虚拟化管理: Android以前提供的此种方式，不够灵活，所以改成了页面自己控制。 后续ajx也不会使用native现在提供的方式，因此不再做了。
+ 2. overlay虚拟化：地图虚拟化，目前客户端无应用，考虑到后续，业务会逐渐迁到ajx和eyrie，因此不再推广使用。
+ 3. 通用功能，overlay显隐: C++有自己的方案，ajx也有自己的方案，后续native会越来越少，因此暂时不考虑开发。
+
+页面栈动画
+
+1. bundle框架切入：启动项
+2. 业务切bundle
+
+
+早会两个问题
+1. 关于代码后期维护的问题。
+大家在修改各业务线代码时候，一定要找基建组业务线的同学reivew。
+
+例如我要改主图，涉及到搜索的代码，那我就要找搜索组的陶伟，讲清楚我的需求，找他帮我reivew代码。
+因为陶伟熟悉搜索代码，可以评估影响。当然如果陶伟有疑虑，可以再找搜索其他同学协助reivew
+
+考虑到代码权限的问题，请reivew完成后，由具体业务线同学提交，并负责后期维护。所以要用心reivew，因为这就是你的代码。
+
+此前提交的部分请确认有业务同学reivew，以后的代码安装上述执行
+
+2. 
+测试影响范围
+
+
+
+20180122早会问题：
+1. 业务需要提供监听页面生命周期的方法，来解决业务间的耦合问题
+2. 关于文档：文字不要太多，画类图，讲明白即可。
+3. 框架组目前阶段最重要的是：关注业务，收集业务需求，由框架进行支持，防止落地困难，可以先拿典型的bundle做例子，先行拆分，找到落地的问题。
+4. 本周需要将SCM问题以及流程确认，下周去支付宝带着问题去。
+5. 缺乏全局进度，每周没组需要完成什么，没有明确的说明。
+6. QA没有明确的定位，需要梳理QA的测试项、收益、时间点等等，明确目标。
+
+1. 830剩余的工作项，细化到周。
+2. 早会形式更新。每天更新进度，要有具体目标。
+3. 设计review的时间点   : 渲染：明后天，
+4. android IOS 功能的拉通
+5. 请假计划。: 许峰待定、焦登宇14号，俊辉年前年后2天，世杰 年前后 加起来3 4天
+
+
+
+大家参与到了架构治理，跟我们一起做基建的工作。
+基建非常重要，是架构治理的基础，
+都是非常底层的东西，有一个共同点，就是影响特别大，
+页面基类，影响所有页面，MapContainer，8 900处调用，渲染引擎，DB、主图框架等等
+有很多，QA没办法单点验证，我们提测也只能是正常回归，这就对我们的质量要求很高。
+举个例子，以前支撑解耦的时候，就出过一个问题，把一个函数从一个类考到另外一个类，
+不小心把一个变量改成了static，导致导航图标不动，结果发了一个patch包，是一个比较严重的问题，
+但是这个问题，代码review很难发现，QA又没验证出来。还有一个，解耦的时候，注释了一端代码，导致线上包带保存log到本地
+当然这个不严重，代码review也没发现。 因此就是想问一下大家对于质量保证，有什么想法？
+
+# 人员：结队编程
+焦登宇 岳仕杰 许峰 三个互相backup
+俊辉 李建章、聪启 互相backup
+
+# 流程：
+1. 必须有设计review。
+  * 背景
+  * 现有问题
+  * 解决思路、设计方案
+  * 模块图、类图、流程图、状态图、时序图（按需选择）
+2. 代码review，有必要的要拿新老代码对比做review
+3. Unit test，有必要的可以写单功能测试的case
+4. Javadoc（仅对外接口），部署到wiki
+5. 准备好文档，做好业务宣讲
+
+1. 改动特别大，合板会冲突。
+
+
+渲染引擎： 陈兴润 
+页面基类解耦 仇俊辉
+岳仕杰 老功能下线： MapContainer
+主图框架整理： 焦登宇
+
+
+
+ 
+本周：
+common代码合入
+扫描工具接入
+需求细化
+需求串讲
+整理基建所有工作内容 形成图，形象化，方便大家参考
+
+下周:
+db和util解耦问题设计review
+api自动打包工具
+
+
+
+
+
+
+本周：
+细化排期
+review 框架
+ db做实验
+
+页面基类解耦的问题。
+
+下周工作：
+db做个实验，做个基础 工具，扫描工具。
+细化排期。
+
+
+## 本周：
+### 崩溃跟进：
+ * 线上崩溃分析，以及结果跟进。
+ 
+### Jenkins相关：
+ * 引擎替换dice.so的 Jenkins job 跟titan联调
+ 
+### CI：
+ * 持续集成1月份工作讨论
+ * libc_malloc 源码分析，以及debug。
+   
+### common维护
+ * http sdk 增加为驾车增加新置项
+  
+### 架构治理：
+ * bundle设计review
+ * Android基建相关工作详细排期计划制定。
+ * db问题分析以及解耦方案讨论。
+
+ ##下周：
+ 架构治理：db解耦
+ libc_debug 跟进
+ 
+ 
+本周：
+1. 崩溃跟进
+2. 架构治理： 新架构方案讨论，以及细化具体计划排期
+3. libc debug 功能调试： 初步结论是C++11标准编译的so可以加载，我们的库都是非C++11的，还需要进一步的验证。
+4. 厂商bug：
+   htc手机，64G sdcard，高德地图，每次启动，高德地图都提示需要切换sdcard。
+   原因：htc的这个手机，64G sdcard 每次启动 ，分区名都会改变，跟我们更换 sdcard 的提示逻辑冲突，因此会有提示。并且64G的才会变，16G的不变。
+   处理：怀疑是HTC的问题，已经由预装团队回复htc，等待答复。 
+
+下周
+ 1. 架构治理，具体实施落地
+ 2. libc debug 功能继续跟进调试。
+
+
+本周：
+崩溃跟进
+spring mvc学习,为即将开始的工作做准备
+持续集成组现有工作痛点，梳理讨论
+协调titan一起，为引擎搭建替换动态替换dice.so的Jenkins job
+common的维护。amap-http-sdk业务开发增加新URL
+
+下周：
+按照本周讨论的结果，进入持续集成方面的开发工作。
+
+1.所有工程，均用统一一套编译方法 done
+2.check所有依赖  todo
+3.开发以及发布流程，梳理成文档。 done
+4.828做什么？做到什么程度。 todo
+5.util合并到commonutil doing
+6.讨论确认，common的每一个组件需要一个负责人。pardon
+7.继续拆分剩余的1w行代码 todo
+8.准备826上线，对以前所有的修改，进行全面的review，确保无问题。 todo
+
+讨论的问题
+1. 828拆到什么程度？拆什么？
+2. 组件负责人怎么？
+3. 编译难， 把代码挪回去。
+
+
+
+
+单功能测试框架以及搭建。
+
+#1  GNaviMap @赵哲  
+#2  ShenmaSpeech_map_v3.6.1.305.jar  @醒神 
+#3  GNaviData @郭启晶 
+#4  GNaviPos @庄浩 
+#5  librtbt.so @李勇聪 
+#6  GNaviSearch 陈志承
+#7  GNaviGuide和Route 赵瑞
+#8  ajx java崩溃 孙波
+#9  ajx c++ 燕东 秋亮
+#10 GNaviUtil 铁棍
+#11 GNaviUtil offline 
+
+
+
+common
+jar包管理下放以后解决bug：Jenkins打包失败，拉代码的python脚本编码问题， 已经解决
+
+组件：
+代码review 
+分支管理流程讨论
+
+ajx会把jsAction 和 srcAjx抽出去。
+
+接下来进入开发流程。
+
+痛点：拆出来的代码，很多业务维护的代码，业务很多问题都抛过来了，都由我们来解决。很多没抛过来，就需要组件权限。准备是等梳理好以后来维护。
+驾车界面，网络不好的时候，错误的弹出一个toast，应该弹出一个错误页面。排查是测试操作错误。
+离线数据下载，拔卡以后会出问题。pathManager问题。
+
+BL：
+BL开发流程文档整理，按照新手入门思路去写的。环境搭建之类的
+
+线上崩溃跟进
+sqlite open崩溃率较高，tbt初始化发了网络请求，没有好的解决办法，让tbt吧网络请求延后，他们正在评估风险。
+
+其他:
+Gradle支持
+QA测试demo，接入accs 
+林鹏，编译时类重复，发现误提交了jar包。
+ajx model注册慢，以前是运行时注册，现在想把model类自动生成json保存文件，在编译时处理好。
+
+总结：
+unknown bug分析
+common问题排查
+Gradle支持
+
+
+下周
+线上崩溃稳定，可以解common
+
+ 
+
+厂商bug：
+【朵唯厂商反馈】地图里截图保存后打开相册跳转至飞猪
+  原因：经排查是由于公交scheme跳转问题，由县长跟进, 820此功能已经下线。
+820 堆乱序崩溃：
+最新结论：基础地图内存越界造成的， new char[] 写成 new char(),在后续操作中，内存访问越界，堆内存被写坏，最终造成不稳定，到处崩溃。
+帮孙栋处理monkeybug
+内存消毒剂 等等工具调研。
+思考：一定要有工具化的测试。内存泄漏，内存越界等等
+
+819.1105 崩溃 万分之7-9左右
+1103 从千分之1.2-1.4 下降到万分之7-9 
+情况比较稳定。
+top1 search崩溃，两个用户崩溃几百次 陈志承 正在跟进。
+
+
+BL线：
+文档建设：
+由于confluence 上没有权限管理，因此准备将BL层文档分为两部分，confluence只放简介文档，以及各个模块文档的链接，具体各个模块的文档，需要权限管理的话，可以自己选择文档位置，并控制权限。
+目前已经完成。
+后续需要持续check各个模块文档完成情况。
+
+1. 完成BL简介文档，并将各个模块文档以及代码下载地址列到简介文档里。
+2. 统计各个业务BL层规划以及完成情况统计，将已经完成的文档补充道简介文档。
+3. 补充完善渲染引擎BL层文档
+
+BL层代码学习以及环境搭建
+渲染引擎以及大demo代码粗略学习
+BL代码编译以及debug流程熟悉
+
+组件扫描工具被岳仕杰注释掉，然后又耦合了，帮忙看了一下。
+
+下周可以切入一些BL的事情。
+common jar包下放
+跟进export的情况
+或者无用代码删除 。
+
+业务下沉：
+公交：轨迹回传:朱强 未开发 (暂定822完成，有跨版风险)
+驾车: 周凯 多路线
+基础地图: 聪启 车辆管理业务逻辑 (常去地点) (10月27号之前完成)
+搜索: 李彬 盛诚 (搜索服务化) https://lark.alipay.com/ep7g0n/osuxh2 (上线过程中可能随时修改)
+
+引擎上漂：
+tbt 志浩 （guide route）
+map 彦君和良榕 (已经完成)
+data 共用 待定
+poi 待定
+pos 待定
+
+大demo
+bl_util_component
+bl_common
+
+GNaviJNI 
+GNaviAAR 
+ 
+  
+时间 崩溃率 启动次数    崩溃uv占比
+9.25 0.031% 89,418,737  0.122%
+9.26 0.031% 112,010,917 0.125%
+9.27 0.032% 116,484,045 0.131%
+9.28 0.040% 123,228,594 0.163%
+9.29 0.037% 134,669,838 0.163%
+
+前台崩溃：
+      第三方神马sdk崩溃，已经反馈，由李彬跟进
+	  引擎swapBuffers崩溃，正在处理。由赵哲跟进
+	  系统库libGLES_mali.so崩溃，暂无解决办法
+	  系统库libwebviewchromium.so崩溃，暂无解决办法
+后台崩溃：
+      so被篡改崩溃。
+	  unknown问题，由马彦军优化dumpcrsh抓取。
+	  
+
+问题：
+1. 很多老业务代码，三不管，暂时留在common里面，后续有人维护的时候再由专人维护，再挪出去。
+2. 有很多很杂的包，梳理起来非常困难。
+3. 有的类，三个业务共同维护，没人接由谁维护。
+崩溃跟进：
+bestor有一些问题，后续需要更新策略
+区分前后台
+数据库表过大(每个版本分一个表，自动化定时删老数据)
+自动生成崩溃情况邮件，再转发。
+
+beta:
+mma前台崩溃 万分之7-8
+argus 实时崩溃
+前台top10
+后台top10
+
+release:
+mma前台崩溃  万分之2.5-3左右
+前台top10
+
+依赖扫描工具：
+基础地图使用以后，提了新需求，打印更详细的log，便于排查问题。
+
+common代码下沉：
+梳理基础地图代码，总体进度30%，基础地图进图60%
+目前已经确认6000行左右已经拆分出去，还有一些需要需要排期拆分。
+目前梳理的问题总共有四种拆分方式
+1. 接口和model类直接移动到export目录下
+2. 逻辑很少，但是跨模块调用的，抽接口放到export，将实现移动到业务中去。
+3. 功能单一但是代码量大的功能，抽成组件。
+4. 确认无用的代码直接删除。
+
+levelDB调研：
+levelDB不支持多进程访问同一个DB文件，而我们代码里面push、messagebox和multidex使用了MODE_MULTI_PROCESS的SP，如果要切换到leveldb上，
+我们需要考虑提供跨进程访问的接口，比如通过AIDL统一到同一个进程中访问。
+
+厂商bug
+1.华为反馈ANR问题
+  确认是离线下载造成的，和岳仕杰确认是已知问题，但是修改涉及的影响面比较大，目前正在梳理影响，然后再和产品讨论确定是否要修复。
+2.国美反馈772版本高德地图启动崩溃
+  经分析是通过pluginManager获取 context为空导致崩溃，是已知问题，后续版本已经修复，建议国美使用新版本进行测试。
+3.中兴反馈amap占用内存超过300M
+  进过与QA的沟通 以及自测，PSS TOTAL内存跟 测试场景 和 手机配置 相关性很大，没有统一标准来表示内存是否异常。
+  QA建议同一个手机不同版本相同场景下对比，来判断是否属于内存异常。单纯的超过300M，并不一定代表内存异常。
+  目前商务已经将我们的测试方法和测试数据反馈给中兴，帮助他们测试AMAP的内存是否异常，正在等待中兴方面答复。
+  另外自测发现：小米5手机，从feed流开始，递归进入多个webview内存很容易超过300M。
+
+其他：
+Jenkins需求：
+QA需要自动获取最新提测包的下载url。
+经讨论，我们将提测包Jenkins任务，每次编译完成，都将下载的url拷贝到一个固定的目录，QA通过Http访问这个目录来获取。。
+已经开发完成，QA已经测试通过。
+下周
+拆common，leveldb测试，bug跟进
+
+后续：
+leveldb 做全功能测试。
+不同的手机上做压力测试，和性能厕所。
+将leveldb移植到amap
+1. 我们替换MapSharePreference实现方式以后，其他业务如果有调用系统的SharePreference接口的地方，可能会导致读取内容失败，需要特殊注意。
+2. leveldb的使用可能会造成amap内存增长，需要评估是否可行。
+3. leveldb，不支持多进程，多进程的SP 不能使用//经过梳理 push 和 messagebox，multidex使用了多process 不能切换 , 或者提供多process的接口
+
+common代码下沉：
+jar包挪到versionManager里面是否合适
+各个业务确认好排期问题，准备下周开始梳理基础地图的代码。
+目标有两点：
+  1. 确认那些代码属于基础地图要拆分出去的。
+  2. 对这些代码进行分类，哪些代码可以用同一种方式去拆分
+
+跟一下基础地图要测试的测试项。每个人单独问一下。
+后续：
+1. 推动各个业务将放在common或者main里面的代码，挪到各个业务export目录下
+2. 将业务jar包放到versionMgr里面管理
+3，推动大家使用模块化功能，收集业务开发痛点问题，重点处理
+扫描工具 增加export扫描的支持
+扫描工具 增加资源扫描
+
+
+
+
+leveldb上线：
+demo工程发现的问题已经全部解决，后续做一些测试后，没有问题可以动手移植到amap上。
+1. 修改demo工程jni层内存泄漏问题2处
+    java层对象被自动回收以后，没有通知jni层delete内存：重载系统finalize ，当内存回收的时候通知jni delete内存
+	jni层调用GetByteArrayElements以后，没有release，造成java层对象不能被回收：调用ReleaseByteArrayElements，释放引用计数
+2. demo工程占用内存13M原因确认 
+	leveldb默认的cache和write buffer比较大造成的，考虑到我们使用场景，并没有很大的数据量，但是对内存比较敏感，因此后续适当缩小cache和buffer
+3. jni增加debug和release编译配置
+   debug模式增加log，出错以后直接抛异常崩溃
+   release模式不打印任何log，出错以后不抛异常，只把错误信息通过log打印出来。
+4. demo工程增加全面的功能测试代码，为移植到amap做准备
+
+可能存在的问题：
+1. 我们替换MapSharePreference实现方式以后，其他业务如果有调用系统的SharePreference接口的地方，可能会导致读取内容失败，需要特殊注意。
+2. leveldb的使用可能会造成amap内存增长，需要评估是否可行。
+
+后续：
+leveldb 做全功能测试。
+不同的手机上做压力测试，和性能厕所。
+将leveldb移植到amap
+
+ 
+common代码下沉：
+各个业务确认好排期问题，准备下周开始梳理基础地图的代码。
+目标有两点：
+  1. 确认那些代码属于基础地图要拆分出去的。
+  2. 对这些代码进行分类，哪些代码可以用同一种方式去拆分
+
+
+扫描工具适配到文华的工程
+
+
+跟一下基础地图要测试的测试项。每个人单独问一下。
+后续：
+1. 推动各个业务将放在common或者main里面的代码，挪到各个业务export目录下
+2. 将业务jar包放到versionMgr里面管理
+3，推动大家使用模块化功能，收集业务开发痛点问题，重点处理
+扫描工具 增加export扫描的支持
+扫描工具 增加资源扫描
+
+
+
+export：
+export总体有多少项已经梳理完成，有一个初步的list，但是还有大约30%的业务不知道是哪个业务。
+主要问题：common里面老代码较多，功能细碎，梳理比较麻烦，需要业务配合。
+前初步梳理的common里面代码问题类型以及解法思考：
+1. 业务接口 （需要下沉到export里面）
+2. 可拆分成组件 （需要业务排期做组件化）
+3. 公共业务，由我们维护 （待讨论）
+4. 相似功能放到一起，但是由多人维护的代码，比如overlay放在一个包下面，但是多人维护 (需要拆分，方式待讨论)
+5. 共用类，多业务使用，但是由单业务维护 (实现挪到各个业务中去，抽出接口放到export下)
+6. 单功能代码，分散在很多包里面 (统一包名，或者 src目录)
+7. util类，可以放入公共util的放公共util，单功能使用的放入功能代码中
+后续: 
+  跟业务确认未知项数据哪个业务
+  跟业务一同梳理现有项如何下沉
+  确认下沉项排期，以及开发进度跟进
+  
+基础地图业务跟进：
+收集优化项，并推动业务排进业务需求list，目前各业务已经全部排进，待需求串讲后可以确认最终落地项目。
+可能存在的问题：
+基础地图的优化项太多，有被砍掉的风险，需要进一步跟进。
+  
+其他
+生命周期hook方案讨论
+
+
+
+1. 看优化项有没有排上
+2. 看基础地图的需求，需要我们做什么。
+3. 其他跟支撑组相关的问题。
+
+common代码下沉：
+前在common中存在属于各个业务维护的代码，现需要各个业务将自己的代码认领回去，为此我们在feature/818/components上线了export功能，方便业务认领代码。
+
+export介绍：在每个业务下有一个export目录，编译的时候，这个目录会当成common的一部分去编译。
+export要求：export目录下只能放各个业务对外提供的接口，以及接口参数的类，不能放业务逻辑代码。
+
+820需要添加的优化项需求：
+  1. 各个业务和@李建章或者@贾晓婷 一起梳理自己放在common里的业务代码，确认这些代码如何下沉，并且确认后续排期。
+  2. 将业务放在common里的接口移到各个业务的export目录下
+
+去CC：
+ 在feature/818/components分支准备820优化项推进支持类
+  * CC获取位置信息相关的getLatestPosition等方法使用AMapLocationSDK替换
+  * CC获取账户信息使用AMapAccount进行替换
+  * CC启动对话框使用AMapPageUtil.startAlertDialogPage替换
+  * CC判断网络状态使用AMapNetworkState进行替换
+
+
+问题与思考：
+common里面业务代码梳理过程中发现，一些业务的逻辑可以作成组件。
+思考：梳理业务代码的时候，多思考，多跟业务多沟通，尽量找到最合适的处理方式。确认好可以拆分的组件以后，尽快补充道组件化排期里面
+ 
+安全问题：
+文件加密基本功能都已完成，并且通过自测。剩余路径加密还未实现。
+细节：
+1. 多线程读写，保持和系统FileOutputStream 特性相同
+2. 测试read、seek、tell、getc、putc 返回值问题
+3. 和IOS兼容，c层使用fwrite fread进行文件读写，而FileOutputStream直接调用write和read，导致两者结果有差异，在jni层自己调用flush解决
+
+export代码梳理：
+跟晓婷分工梳理现有common里面属于业务的逻辑代码，目前来看梳理的主要基础地图代码最多，820需要基础地图出人力一起处理
+后续工作：
+1. 继续梳理业务代码，并和业务开发人员进行拆分
+2. 老主图代码删除 (基础地图的人来处理，同时整理mapcontainer)
+3. 共有代码逻辑处理（代码分类）
+4. jar包版本考虑·管理放到versionManager
+
+其他：
+内部优化项协调QA测试问题
+安卓安全考试
+ 
+下周：
+1. export 代码继续梳理
+2. 崩溃接手
+ 
+
+
+ 
+问题与思考：
+1. 需求开发过程中，评估开发时间要充足。
+	思考：多人合作开发的项目，评估开发时间时，如果时间允许，除了预留具体开发时间，最好还要预留处理意外风险的时间，保证最终的整体时间安排。
+2. 需求调研阶段，要多讨论多思考。
+	思考：需求的设计阶段，尽量想清楚各种方案，以及各种风险，及时同步给大家，有了新想法及时拉相关同学一起讨论，思路的碰撞，更能产生合理的方案。
+
+安全问题：
+文件加密: 方案确认，开发完成80%。需业务排查文件中有没有账号密码等特别敏感信息，如果没有文件加密818暂时不上线。
+	细节：
+		迁移过程细节问题确认。
+		文件路径操作相关函数C语言实现，并自测完成
+		jni封装层开发完成。
+	剩余：
+	 1. 对于文件路径是否需要加密，还需要进一步确认。
+	 2. 文件加密java层封装。
+sp加密: 方案已经确认，对敏感信息单条加密。
+db加密：有初步的方案，还需要进一步测试确认。
+
+其他：
+网络库cookie问题由喜哥跟进解决。
+
+		
+下周：		
+  文件加密继续开发
+  comnon组件化开发
+
+
+
+风险： sqlcipher稳定性，sqlcipher导致发版包变大2M， 需要业务开发。最终上线需要进行测试评估。
+
+apk包减小
+ 跟郭悦讨论，他初步从减少重复和无用图片的角度去处理，如有特殊需求，会跟我们一起讨论研究。
+ 
+安全问题
+确认最终的方案，下周确认接口，并开始开发：
+安卓数据库加密：采用sqlcipher，在每个数据库初始化时做迁移，由于sqlcipher android端稳定性未知，我们会保留两套方案，当加密方案不好用时，继续使用无加密的方案，预计下周完成开发，并测试整体的迁移时间。
+sp加密：经调研安卓和IOS后期统一leveldb作为kv存储方案，但是由于leveldb在移动端稳定性未知，安卓端818仅采用对现有sp内容加密的方式落地。接口已经梳理完成，预计下周开发完成，并做测试迁移时间，提供给业务使用。
+文件加密：经讨论文件采用单字节加密的方式，两端统一，用c或者c++实现加密方案，然后IOS和android各自对业务封装接口,接口预计下周完成，开发预计下下周完成。
+文件路径加密：准备对文件路径的字符串进行xxtea加密，然后base64作为加密后的文件路径，预计和文件加密同时完成。
+
+剩余工作：
+c层加密文件读写
+文件路径加密实现
+文件以及目录操作jni封装
+文件java层封装
+sp加密实现
+
+风险点：
+ sqlcipher安卓端多机型稳定性位置
+ sqlcipher导致发版包变大2M
+
+
+其他：
+组织大家串讲各自工作
+安全问题 公网包里面删除测网地址以及明文IP
+基础地图需求串讲
+common 优化项落地进度追踪。
+
+
+
+
+1. 邮件  非沙箱-》沙箱    敏感数据加密(账号 等等)
+2. 组织串讲
+普通文件，sp，sql
+
+1. 网络库重试机制。计划在网络库重试加上云控配置，可以动态修改重试次数。 这个需要各业务线关注一下是否会影响业务的网络请求
+2. 去CC(获取位置信息、获取账号信息、启动对话框、wifi是否连接，网络是否连接、获取移动网络类型功能)。这部分到时候需要各业务线修改一下
+3. 业务组件化。目前818优化项有些组没有包含业务组件化的内容，这个看能否按照之前给的排期给加上？
+4. 安全问题
+
+
+
+问题与思考：
+1. 模块化解决业务痛点问题的调研以及思考
+   考虑到模块耦合可能是很多大型APP共同存在的问题，我们在做的同时可以参考别人思路，起到它山之石作用。因此做了一些调研，思考后发现我们有两个问题可以解决：
+    1. 我们通过getService的方式解耦是个很好的方式，但是接口放到单独工程里面，作为jar包维护的方式并不方便，而且有很多的新加接口，没放到jar包里面，直接扔到common里面。同时业务升级jar包需要修改common，导致common权限无法收回
+    2. 目前 如果两个业务间有共用逻辑、so、jar包、资源等等，都是放到common或者main里面的，并不合理，这也是common和main权限无法回收。
+   解决办法：
+   1. 在每个业务下新建一个export目录，该目录支持，java、res、jniLib、jar包、assert这5类文件，将该目录添加到common的
+   build.gradle里面。相当于虽然这个目录在各个业务的工程下，但是它最终是common的一部分，各个业务可以把新开发的接口放到或者共有逻辑
+   放到export目录下，自己管理权限。
+   2. 对于升级jar包，需要修改common，可以将jar包的管理放到versionManager里面。
+   可能存在的问题：
+   export相当于给大家开放了一个非常方便的，往common里加内容的接口，随着业务的开发，可能会越来越大，后期可以考虑从check工具入手，限制大家往里面放太多东西。
+  
+  参考微信解耦的文章：
+   https://mp.weixin.qq.com/s?__biz=MzAwNDY1ODY2OQ==&mid=2649286672&idx=1&sn=4d9db00c496fcafd1d3e01d69af083f9&chksm=8334cc92b4434584e8bdb117274f41145fb49ba467ec0cd9ba5e3551a8abf92f1996bd6b147a&scene=0&key=d6331003961a2cc4a993346128e7e0a6e1f67ffd9228a1d3671fe93a1a18227a79726cf27d654dd1cbeda9a08303bf5110f87375e634512f8df895c139362de314c917fd5fab93450f3ea13f554da58c&ascene=0&uin=MjE0NTE1&devicetype=iMac+MacBookPro11%2C4+OSX+OSX+10.11.6+build(15G1510)&version=12020810&nettype=WIFI&fontScale=100&pass_ticket=XdMtYcWk0O8PYefGg9yk9FDz%2F4H3YVhrDyX2STYORVA%3D
+
+2. 业务反馈关于资源的一些问题
+   1. 资源不好找，新加一个资源，需要先翻一下common里面有没有，main里面有没有，自己业务里面又没有
+   2. 资源重复，目前存在很多资源重复的问题，如果资源更新了，在merge的时候很容易出bug，而且会导致发版包变大。
+   经过与一些同学们的沟通，以及调研有如下想法：
+   1. 初期来看，重复的图片资源，我们可以通过脚本程序，计算一下md5，如果相同则只保留一个。
+   2. 参考了UC所遇到的资源问题，后期我们是不是可以做一个资源管理平台，将所有资源统一管理，有如下优点
+    1.可以做到无重复，
+	2.可以让开发人员很容易找到，
+	3.可以多端统一，android、IOS、动态UI、车机都可以使用一套资源。
+	4.可以统一的增加一些策略，比如：将资源名称进行proguard，进一步减小发半包的大小等等。
+   
+   参考UC资源问题：https://www.atatech.org/articles/87376/?flag_data_from=mail_daily_recommend&uid=155544
+   
+组件依赖扫描工具：
+已经适配的本地，提交到feature/818/components分支上
+
+扫描工具 java1.7 适配 已经完成
+扫描工具 优化log显示
+扫描工具  多线程适配，加快扫描速度
+扫描工具 适配到本地	
+推动业务解决新引入的耦合问题。
+
+模块化以及组件化：
+所有模块增加export功能，已经提交到feature/818/components。
+主图组件化进度追中
+
+安全问题：
+sdcard数据安全问题解决方案讨论
+安全问题列表排查
+
+其他：
+common、main 关键代码扫描落地跟进
+平台支撑优化项收集
+
+
+
+聪启
+1. 扫描工具适配到本地
+2. interface的新方式
+3. 后续业务跟进(需求串讲，晨会，等等)
+	
+	
+去jar包
+1. jar包代码放入 各个业务模块里面
+2. 文件重命名.java -> .api (或者不改名字，直接放在某个目录下)
+3. 编译时，新建一个gradle task，将所有的 .api 拷贝到一个module里，所有业务以来此module
+
+好处
+1. 多工程 ->单工程，
+2. 减少修改成本  (jar包工程加接口 -> push maven -> 修改common -> 写接口实现)->(修改接口 -> 写实现)
+   很多业务直接将接口放到common里面，这样就可以很方便的放在自己的目录下。
+3. 提高灵活程度，可以导出非接口的文件(class、resource文件)
+   业务公共代码，可以下沉到导出的代码里面。
+
+缺点
+1. 增加编译时间(文件拷贝，java文件编译)	
+2. 需要业务开发(jar包文件拷贝到业务代码+重命名)
+3. 有可能存在业务随便导出，结果导出特别多，又成了一坨的现象。 (check工具只允许导出 interface)
+
+ marven 相关
+
+
+模块化现有问题：
+1. StartProcessImpl   267行 主动throw exception @聪启
+2. 云同步so 建挺
+3. splash依赖operation  搞定了
+4. 微博登陆
+
+建挺 
+1、组件增加so支持
+2、组件为啥不支持jar
+3、编译的时候，错误依赖就崩，能不能实现。
+
+
+产品需求不合理   梳理技术权威
+业务对于框架的要求，
+  1.前置收集， 确认问题，    
+  2. 业务对框架要求
+
+  1. ios平台能支持，为啥android 不支持
+  2. 竞品对比，竞品能做，为啥我们为啥不能做
+
+扫描工具有bug，放到Jenkins上，开发时候就编不过
+搞一下，怎么 往maven上穿包。然后依赖。
+
+1. 模块化注释了主图的代码，告诉业务去解决耦合问题，结果业务没有改，812临近发版才check到业务没有解决，才导致紧张的修复这个问题。
+   * 以后如果有类似的问题，应该及时check，跟业务定好修改时间，在开发阶段就解决。
+   * 我们工作跟业务关联很大，合作时候一定要注意沟通方式，摆事实讲问题，但是落实到行动上，可以多做一些。
+   * 自己的改动涉及到业务逻辑，一定要拉业务一起check好影响范围，并且亲自上手调试确认，避免业务说没问题，但却发现了问题。
+   
+2. 关于模块化落地沟通，跟主图沟通发现，mac上amap编译比较快，模块化编译收益不大，导致他们没兴趣使用，他们更关注的是，模块化能不能解决他们的痛点问题比如性能测试，能否快速确认是哪个模块导致的。
+   * 我们觉得很好的事情，到了业务那他们觉得不是痛点，以后跟进业务的时候，一定要注意收集他们的痛点问题，思考能不能从我们架构上去解决，及时调整方向。
+   * 模块化我们推动的最大收益是编译时间，对于mac本来讲这不是痛点，还需要想更多的落地点。
+   * 关于落地点不够多：模块化我们不是使用方，可能并不能全面想到落地点，以后跟一线同学多沟通，看看他们是不是有新的落地点，我们可以推广到别的业务去使用。
+   
+3. 技术分享
+  * 技术分享PPT，文字不要太多，每一页内容不要太满，多用图片表格等形式，尽量做到生动形象。
+  * 分享前做好充分的准备，ppt文字不多，那对演讲者要求就更高了，把要讲的内容多记几遍，讲的时候会更顺畅
+  * 分享会参加的人数是有限的，但是模块化，组件化确是很多开发人员要使用，这样的推广力度可能不够，考虑到我们每个人都在跟业务线，在跟的同时，我们要同时推广一下我们框架，让更多的人使用。
+
+业务更关注的是，对他们有用的点。 
+  
+  熟悉管理流程，搭建流程 ，数据库备份
+
+playground 对主工程修改都注释掉了，以后怎么上线？ 谁用谁取消注释？
+playground 要不要带上，组件代码？？
+完全编译的时候，是不是所有组件都带上了？
+为什么不能循环依赖？
+
+
+maven
+
+ 1. 跟进基础地图和搜索组件化业务工作
+ 2. common组件化开发
+ 3. marven 相关
+ 4. playground PPT 以及宣讲 和ios对一下看看有什么需求，问一下啥时候宣讲
+
+组件化依赖扫描：
+本地已经完成，支持import和service两种方式，可以生成依赖关系的图片并通过邮件发送。
+细节：
+ 1. 各个模块间代码直接依赖问题扫描
+ 2. 各个组件依赖自己模块问题扫描
+ 3. 组件间循环依赖问题扫描
+ 4. 支持配置文件，可以动态配置扫描项。
+ 
+ 下周
+ 1. 跟进基础地图和搜索组件化业务工作
+ 2. common组件化开发
+ 3. marven 相关
+ 4. playground PPT 以及宣讲 和ios对一下看看有什么需求，问一下啥时候宣讲
+
+主要问题
+1.需要java 1.8支持，Jenkins服务器为java1.7，下周与服务器维护人员确认相关问题。
+2. cc.getService 调用可以扫描出来，但是有些参数是运行时确认的，不能确认，解决方案为，将import的所有interface均当成 getService的内容，能找到实现类则视为依赖。
+3. startPage 同样存在参数无法确认的问题，同时还存在，IPageContext派生类过多，接口类不好确认的问题，暂时无法解决，
+4. 组件间循环依赖，需要深度优先搜索算法来实现，通过调研已经实现。
+
+组件化：
+主图我的和设置两个界面由于开发进度问题，排期到818
+
+
+816跟进项
+
+owner 意识
+
+跟进搜索和 主图
+
+  跟进基础地图组件化的开发和测试，  common组件化改动由基础地图测试，需要同时跟进
+  
+组件化自动扫描：
+   import的依赖可以自动扫描，并且可以生成图片。
+   注解的依赖的方式已经缕清，等待考虑实现方式，以及编码。
+     依赖一共有6种 
+		类直接依赖  //import 可以搞定
+		interface非反射  //import 可以搞定
+		interface反射   //startService方式，拼字符串和读文件可以搞定
+		startpage  读文件可以搞定
+		其他注解   读文件可以搞定
+		sp：    暂时不考虑。
+模块化：
+   相关代码已经合入816/componets分支，至此所有模块均可单独编译。后续跟踪使用者反馈的问题。
+   1. 解决主图耦合问题11个
+   2. 
+   
+ Playground：
+    完成框架开发，完成一个示例，并且完成wiki。后续需要把扫码工具jar包对比作成测试用例。
+   
+  
+  
+   
+   驾车业务需求串讲，需要总结业务点，总结后续业务安排，可以组件化模块化的后续工作服务
+   发现新引入的耦合问题7个，由聪启解决。后续要多review
+   代码review 发现很多问题，后续一定要做设计review 说明为什么方便发现问题。
+   代码修改影响范围整理，已经由喜哥发出。
+   组件化依赖，自动扫描//已经完成原有逻辑扫描。总体时间可控单线程在8秒左右，需要补充CC.getService方式的依赖。
+  
+  网络库代码解耦
+  组件化依赖自动扫描 完成CC.getService 依赖扫描
+  合入最新分支。作为816开发分支。
+  
+  网络库相关解耦
+  组件依赖自动扫描
+  
+
+  本周，拉各个业务线review代码，然后推动各个业务816开发过程中去使用
+
+  抓重点-思考-解决问题-工具化能力 
+周报要求：
+1.先写问题(问题写好解决方案，影响范围，如何落地等等)
+2.各个模块先写整体进度以及一句话总结，后写细节问题
+3.下周计划，可以写到单个模块里面，不用写到下周计划这个分类里面
+4.排版
+
+
+  
+模块化：
+  总体进度：
+  模块化：各个模块在分支上均可单独编译运行，等待816上线。 80%
+	 组件化：816已经排期，待开发。5%
+  1.重新梳理release/812代码修改，后续开发的代码又引入了新的代码耦合问题，已经解决。
+  2. offline、life、search模块单独编译：已经完成
+     各个业务模块增加null判断，单独编译通过，并且自测不崩溃。
+common组价化
+  1.jsAction相关代码拆分：已经完成。
+    梳理清楚属于哪个业务，然后跟业务沟通发现，这种划分方式并不合适，最终决定将所有的jsAction代码从common抽出一个单独目录，后续做成jar包或者小组件形式。
+  
+问题：
+  1. 梳理release/812代码时，发现由于疏忽，代码修改存在一定的问题。
+     增加null判空，同时修改了几百处，这种逻辑简单，但是数量多的修改，是比较容易出差错的，别人review代码时候，也容易忽略过其中的错误。修改完成的代码，后续多自测，让别人review代码或者自己review别人代码时一定要仔细认真，这种特别多的修改，可以适当增加review的层数。
+  
+  
+模块化：
+  1. 增加mockService以后各个模块可以单独编译不崩溃
+     已经完成common、main、operation、route 剩余life offline search
+  2. 各个业务负责人讨论模块化方案
+     决定从组件化的方向去解决模块化功能耦合问题，我们从编译流程上提供一个，组件编译的功能，各个业务把可以拆出来组件代码放到单独目录中即可。各业务负责人均同意此方案。
+  3. 从夸模块调用的角度梳理各个模块可以拆分的组件
+     已经由建挺形成文档http://gitlab.alibaba-inc.com/amap_android_rd/amap_wiki/wikis/component.md
+  4. routeLineView解耦方案修改方案以及影响确认，与业务沟通，确认可以816实时落地
+  5. common组件化jsAction相关修改方案确认
+    各业务相关的代码下放到各个业务，老的无修改的业务打成jar包，或者放到operation里面。
+  6. 816模块化需求收集确认
+  主图：我的页面、设置页面
+  公交：路线规划header组件、公交报错功能。  
+  驾车：TTS组件化，scheme解耦合,语音广场
+  搜索：搜索服务组件化方案整理
+
+  下周：
+    模块化：mockService以后各个模块可以单独编译不崩溃(life offline search operation)
+	common组件化：jsAction相关代码解耦抽离
+
+  问题：找各个业务讨论问题之前要做好充分准备，把所事情尽量想完整，业务组件化解耦，最好自己先确认方案以及影响再跟业务区对一下。
+  
+  
+  搜索  搜索服务 可用c++组件化 
+  驾车  tbt  三维下载 语音广场 c++ 组件化 ， scheme，TTS，定位
+  公交  路线规划header组件
+  
+  
+  
+
+  复杂依赖怎么解决
+
+  
+  总体规划：
+  代码层耦合拆分：预计816-818完成
+  业务耦合逻辑：需要业务配合预计按照 6月-7月基础地图模块化，8-9月驾车导航模块化，10-11月公共出行模块化，12月信息服务模块化。 
+  业务逻辑耦合需要业务配合，依赖于业务排期，因此时间可能会有所调整。
+ 
+  各个业务对下一：
+  1. 说明816 上线所有的，单独编译，看看上线的方式(能不能我们改代码他们review，或者必须他们改)，尽早让业务使用模块化功能，并且持续收集使用过程中的问题，一步一步优化我们的方案。
+  2. 说明要做组件化这件事，排期看时间安排。
+     1.让业务出人，大家一起屡一下具体的模块逻辑
+     2.制定落地的进度。  
+  3. scheme，TTS ，RouteLineView解耦。
+    
+  怎么找出业务之间的耦合？ 挨个翻代码很麻烦。希望业务能抽出一定的人力配合梳理。
+  
+  夸包访问的方式：getService、startPage、sp、scheme、注解 、intent 
+
+  可以先推大家使用，然后看大家反馈
+
+   总体进度： 20/100
+  
+  确认816上线计划：
+	1. 各个模块+common+main都能单独编译通过且运行无崩溃，尽早让业务使用模块化功能，并且持续收集使用过程中的问题，一步一步优化我们的方案。
+	2. scheme，TTS ，RouteLineView解耦。
+  
+TODO：
+   util：没有用新的util库
+   CC，812无用的代码删除
+   
+   
+  
+  模块化：
+  1. 解耦方案确认。
+    原计划方案是：对于CC.getService()提供一个mockservice ,startPage()提供一个默认的page sp我们提供一个写sp的界面。但是和业务讨论完以后发现，业务方对于各个模块能单独编译需求比较强烈，模块间功能耦合，我们提供的方案使用过于麻烦，他们更倾向于组件化，将业务打散成更小组件，别的模块只依赖组件即可，不用依赖整个模块。因此模块化后续的工作有重点有两块：(1)确保各个模块+common+main都能单独编译通过且运行无崩溃。(2)将业务中耦合比较严重的模块，拆分成小组件，其他模块依赖小组件即可，不用依赖大的模块
+  
+  2.基础地图模块化： 
+  本周完成： 主图模块化合入release/812分支，发现新增了两个代码直接耦合问题。已经解决。此分支会作为812基准的开发分支，供主图开发使用，我们会持续收集使用中问题，修正后续的工作。
+  
+  待完成：使用问题收集以及解决 持续进行 
+          代码夸模块直接调用问题 共22个已解决20个，剩余两个业务排期预计6月底完成
+ 
+
+ 
+  2. 驾车导航模块化：
+  本周完成：scheme，TTS 2个耦合，确认解决方案。
+  
+  待完成：
+   mockService的方式，单模块可以编译通过且不崩溃
+   业务耦合修改等待排期。
+   使用问题收集以及解决 //持续进行
+  
+  3.公共出行模块化		
+   本周完成： RouteLineView耦合，确认解决方案。
+   
+   待完成：
+   mockService的方式，单模块可以编译通过且不崩溃
+   业务耦合修改等待排期。
+   使用问题收集以及解决 //持续进行
+
+  4.信息服务模块化
+  本周完成：无
+  
+  待完成：
+   mockService的方式，单模块可以编译通过且不崩溃
+   业务耦合修改等待排期。
+   使用问题收集以及解决 //持续进行
+  
+
+   问题：
+  1.组件化过程中，很多耦合点，跟业务讨论以后才发现后续会改成动态UI，及时了解动态UI替换的计划，被替掉的部分不用浪费时间。
+  2.通常情况下，业务作为模块化的使用者，想法更符合实际， 我们有了想法要和业务多沟通，避免出现我们觉得很好，做完了，别人却不使用的情况。
+  
+  下周：
+   完善mockservice，
+  
+  选择哪几个模块编进去，有没有好的方式 //业务觉得没必要
+  
+  新主图相关业务要不要拆到主图里面？  //对一下拆到main里面
+  
+  
+  mockService：功能网状耦合， 暂时不支持。
+  page不用管  service 还需要mock
+  common 组件化高优
+  
+  
+  814上mock service的框架，然后拆分输入框。
+  
+  主图模块化 已经合入，并且已经通知各个业务线合入
+    
+  以后周报中，写一个量化的进度 814的需求。
+ 
+
+，
+  
+   
+  •横向模块化
+o	基础地图（common，life，operation）（2017.7）
+o	公交（2017.8-2017.9）
+o	驾车（2017.10-2017.11）
+o	搜索（search，offline）（2017.12）
+
+  等到810/release以后,主图模块化需要重新测试一遍
+  
+  
+  
+  
+  
+模块化：
+  主图模块化，812上线，剩余问题2个 1.哲明812修改   2.instanceof 杨超， 3.drive和route 模块统计cc.getservice。更加详细分析互相依赖，
+  推动各个业务去修改，810release 以后需要详细的自测，告知QA回归测试
+common组件化：
+   common组件化，需要看代码
+ 
+
+模块化：
+1.时间收益摸底
+  编译时间对比：通过点击studior un按钮进行操作(三次取平均值)
+    release/808分支 -> 模块化分支(仅保留common main operation三个模块)：
+    完全build时间：7:55 -> 4:28
+    完全clean时间：32   -> 20.4
+	
+2.主图模块化(保留common main operation三个模块)：已经确认812上线
+    1. CC.getService增加null判断：common共117处 ，operation共41处，main共17处
+	2. 代码直接调用耦合问题22个：已解决问题20个，剩余问题聪启待解决1个，范哲铭待解决1个
+
+3.operation拆分(在主图模块化基础上，operation单独拆分出去)：
+    1. 代码直接调用耦合20个，资源耦合6个，资源耦合已经解决，代码耦合
+
+4.route模块化：
+    1.有CC.getService判空问题共59处
+	2.无代码直接调用耦合问题，但是通过CC.getService、startpage方式与drive耦合比较严重，不能正常调试，而且这两个模块代码量非常大，需要进一步解耦。
+	目前能确认的耦合问题有目的地输入和语音选择两个功能，更详细耦合问题还需要进一步梳理
+
+5.drive模块化：
+    1. 有CC.getService判空问题共83处
+	2. 无代码直接耦合问题，但是drive模块在主图上没有自己的入口，依赖于route，search模块来调用，因此需要进一步解耦，更详细耦合点需要进一步梳理
+
+6. search模块化:
+    1.无代码直接耦合问题，有CC.getService判空问题
+
+7. offline模块化:
+    1.无代码直接无耦合问题，有CC.getService判空问题
+
+8. life模块化：
+   1.无代码直接无耦合问题，有CC.getService判空问题
+ 
+810开发进度追踪：(全部完成)
+   1. mapContainer楼层控件和景区控件拆分：已经完成
+   2.screenshot 接口修改
+     MapScreenshotPresenter：广杰 已经修改完 1处
+     SelectFixPoiFromMapPage：杨涛 已经修改完 1处
+     FootNaviViewDisplay：仇俊辉 已经修改完 1处
+     DestNaviViewDisplay：杨涛 已经修改完 1处
+   3. 渲染引擎删除接口: 已经完成
+
+  
+common组件化：
+    代码模块梳理，讨论进度计划
+
+
+  
+screenshot 相关：
+删掉 MapViewScreenshot
+MapScreenshotPresenter：广杰 已经修改完
+SelectFixPoiFromMapPage：杨涛 来修改测试 下周一改
+FootNaviViewDisplay：仇俊辉 下周一改
+DestNaviViewDisplay：杨涛 下周一改
+
+810开发：
+  1. mapContainer拆分:楼层控件和景区控件可独立的逻辑拆出来放到主图，MapContainer仅提供getView接口，跟广杰讨论好修改方案以及开发计划。已经开发完成 
+  2. mapContainer拆分:screenshot功能拆成独立的util类，已经开发完成并且合入feature/810/newPagesFramework分支，拆分过程中发现代码中提供了两个screenshot的实现一个在MapContainer中，一个在MapViewScreenshot中，逻辑部分重复，修改后已经合并成一个，合并后的类提供两个方法：只截底图、底图view一起截。Mapcontainer保证兼容性接口保留但是实现转到新接口，MapViewScreenshot已经协调各个业务810会修改到新接口。修改情况如下：
+    MapScreenshotPresenter：广杰 已经修改完 1处
+    SelectFixPoiFromMapPage：杨涛 下周一改 1处
+    FootNaviViewDisplay：仇俊辉 下周一改 1处
+    DestNaviViewDisplay：杨涛 下周一改 1处
+  3. 渲染引擎删除接口:跟渲染引擎同学确认810删除4个接口 //已经删除这4个接口并且已经合入feature/810/newPagesFramework分支并提交。
+
+主图模块化：
+  各个模块耦合接口梳理完成，跟聪启沟通确认好解决方案，共发现22个耦合问题，已经开发解决其中17个，剩余5个由聪启解决，预计下周解决完，并且和各个业务模块讨论落地方法和时间
+  编译时间对比：通过点击studiorun按钮进行操作(三次取平均值)
+   release/808分支 -> 模块化分支(仅保留common main operation三个模块)：
+   完全build时间：7:55 -> 4:28
+   完全clean时间：32   -> 20.4
+ 
+	
+引擎JNI代码梳理：
+  熟悉部分引擎JNI代码
+  
+
+
+
+bug:
+软键盘隐藏时，主图view不跟随的bug
+经排查动态ui引擎回调给客户端feed流高度bug，导致view不跟随，反馈给动态UI同学，确认问题后解决
+
+主图模块化
+1.梳理amap启动流程，熟悉各个模块如何初始化
+2.工程中仅保留main operation common 三个模块，调整代码保证编译成apk，且无崩溃
+ (1)注释掉直接引用其他各模块的代码
+ (2)对所有CC.getService 增加null判断，
+ (3)处理其他可能导致崩溃的点
+3.统计分析直接调用模块代码的接口
+ (1)route模块接口修改方案已经确认，并且相关负责人已经确认修改
+ (2)drive模块接口方案基本确认，待排期修改
+ (3)search offline life模块待进一步分析整理中
+
+其他：
+ 引擎jni编译环境搭建
+ 代码review，ak环境搭建
+
+
+
+1.MapContainer逻辑梳理完成，并且讨论制定的修改方案，确认810上线计划
+2.新旧版主图工作逻辑确认，避免重复劳动
+3.引擎修改接口，确认810可修改的接口
+4.overlayManager 逻辑梳理，便于拆分
+5.amap代码学习
+
+
+1. 渲染引擎适配层现有的接口和回调逻辑已经缕清，新的修改方案已经讨论并确认
+  适配层现有逻辑GLMapView相关接口，对外输出比较乱，分布在MapContainer，BaseMapContainer，MapManager等几个类中不利于使用，EagleEyeMapView和MainMapView逻辑设计也比较乱，修改后的方案缕清了他们之间的关系，逻辑更加简单，对外输出接口更加明确。
+2. mapContainer 逻辑梳理完成
+  现有mapContainer功能特别复杂，分担了业务逻辑、view创建、pageContext内容传递 等等功能，本周主要缕清了mapContainer代码逻辑，总结出其中的问题，修改点，并且设计一个修改框架，明确下一步的实时计划
+
+
+渲染接口缕清，修改方案基本确定
+mapcontainer 本周缕清，然后对一下，后续执行步骤
+page生命周期相关代码逻辑缕清 
+
+
+external-libs：dalvik 干啥的
+javasource 目录下的连个文件干啥的
+libDbGenerator 两个jar包 干啥的pushstud 干啥的
+libs下的那么多jar
+pushstub
+大量的resource文件 ，是地图的所有图标都在common里面么
+resModularity 干啥的
+src各个目录
+
+
+
+QA测试问题分析支持。
+flp converity代码扫描问题修改,review 以及问题修改 //已经完成
+flp apk增加debugNoProguard 编译类型 //已完成
+flp apk 首次安装内存消耗明显高于第二次启动问题 //首次启动有系统弹窗，加载资源多消耗内存
+debugNoProguard没有test 界面不启动问题 // 增加buildtype以后，test包需要单独增加到编译类型里面，增加后解决
+华为安全测试问题分析 // 10%
+
+
+
+重构测试：
+  崩溃平台更新，和建挺沟通新的配置项和配置方法，并写入wiki //已经完成
+  崩溃平台更新，不能显示flp的crash //正在与服务端同学沟通，有bestor平台同学解决
+  [FLP apk]Framework与SDK交叉调用与移除，出现连续启动-》崩溃 //flp fusedengine NLP跳点被过滤掉以后，没有增加null判断，因此崩溃，已经修复
+  [FLP apk]采集崩溃 //去掉collectorConfig.mapkey = null; 这一行配置后解决，同时采集模块也做了防错处理
+  [FLP_SDK]正常定位过程中，一直报异常，找不到 HWFLPLocationManager //重构后相比于重构前，少了HWJNIFLPLocation.jar 库 ，flp_dr 增加此库以后解决。
+  [FLP_SDK]偶现request的时候没有位置返回 //由于采集崩溃导致的flp定位停止，和flp采集崩溃 一起解决
+ 【FLP-APK】用定位SDK的demo测试的时候，每次进行网络请求的时候都会有权限确认的弹框 // 已经和产品讨论好需求，已经开发完成，测试有bug ，待进一步分析
+ 【FLP-APK】flp 2分钟无位置返回 //手机链接wifi，从系统读到的wifi list为空，我们的策略是，有wifi链接的情况下，五分钟扫一次wifi，中间有5分钟之内没扫描，所以没位置返回。
+  flp sdk 多线程访问，在没有鉴权成功情况下就会下发命令 //已经加保护锁修复
+  flp sdk Service destory 造成exception问题修复 //改到application里面初始化
+  flp apk 生命周期管理多处内存泄漏， //已经修复
+  首次定位测试demo，开发修改 //已经完成
+  flp crash 更新保存策略  //已经完成
+
+和法务讨论，坐标插件保护 相关事宜。
+
+permission 弹窗问题处理
+flp apk 生命周期管理不对 
+crash 10分钟保存重复 //crash时候只上传1个， 初始化 或者连wifi会全部上传
+
+  
+
+
+
+性能测试：
+Emmagee 测试工具代码修改，使其支持 service性能测试
+Android N 获取app pid方式研究，
+  //已经被 selinux 关闭，暂时没有办法自动获取,因此性能测试只能在android6.0上进行 
+flp apk性能测试对比  
+  //1.重构前后性能对比：
+  //总体来讲，不管是CPU还是内存，重构后的性能均优于重构前。体现在内存上，内存占用量变小，GC周期变长，体现在CPU上，CPU占用明显降低。
+  //2.重构后版本 indoor network gps 三种模式测试:
+  //三种模式debug版本内存占用基本相当，release版本 indoor模式占用高于其他两个模式。CPU上debug版本network和 GPS占用CPU较高
+  //重构后性能主要消耗模块为: wifiScan、AR、indoor
+
+重构：
+flp sdk extraCommand增加保存导航命令的功能
+flp 增加NL的埋点，以便于解决cache问题
+flp apk QA代码串讲以及测试问题解决
+flp apk 测试用例评审
+
+case:
+一加 高德地图刚打开系统无GPS定位图标问题 //一加使用1.7.0的flp， 此版本厂商配置错误，FLP默认不使用GPS，导致此问题，建议一加升级FLP版本。
+
+其他：
+AR PDR算法分享
+和法务讨论 坐标插件 保护相关的情况 
+  //已经讲明工作原理，并给出类似专利，法务评估决定对于坐标插件重新申请一个专利，并且尽快提交，以保护我们产权
+  //转换插件，由于排他协议问题，华为开发工作暂停，因此总体的进度可能会受到一定的影响。
+坐标插件专利技术交底书撰写
+
+
+删除的绩效
+低功耗地理围栏
+起止时间: 2016-12-01 至 2017-04-01 目标进行中  编辑  删除  完成并评分
+目标描述	1.低功耗地理围栏新技术预研
+2.新技术实现以及测试
+3.测试DEMO开发
+4.文档整理
+衡量标准	1.调研低功耗地理围栏技术，并形成文档
+2.实现新技术，并产出测试版本
+3.同步分成测试demo，以及测试报告
+4.同步整理文档
+客户	未填
+
+
+重构：
+flp和 NLP 主工程 dumpcrash crash时log增加lastlocation
+flp 主工程升级版本，编译问题整理
+NLP反馈需求确认接入 //已经完成，等待测试
+FLP NLP apk文档增加采集和反馈 wiki
+
+坐标插件:
+坐标插件华为沟通以及进度安排  //3月7日之前 接口核对 方案核对
+问题: 需要准备编译系统和环境(xp电脑，虚拟机付费，linux系统)
+问题：之前与硬件联通的Diagnostic接口废掉了，新方式还需要讨论。
+
+case:
+MHA 导航时ipl不开启 //flp 被系统杀死，导致ipl命令丢失，手机配置锁屏不杀flp并且flp开机启动
+flp主工程预装窗口crash bug //子模块依赖版本不一致，访问的方法存在导致crash。修改子模块依赖后修复 
+
+其他：
+IOS定位技术分享会
+NLP 中兴去掉定制弹窗  //已经修改、编译、自测、发版
+
+
+  
+采集和 反馈模块，代码架构梳理
+采集模块，老版和重构版差异比较整理，准备评审文档
+FLP NLP采集需求讨论会 //确认需求
+FLP NLP采集模块接入完成 //等待采集测试完成后 正式上线
+NLP dumpcrash 问题梳理修复
+AR fusedengine 测试用例评审
+NLP 重构工作梳理以及分配
+
+低功耗导航，协助预装团队排查，围栏下发不成功问题 //客户端问题导致
+NLP Samsung新需求：将meta data中定义的serviceVersion修改为 10001 并编译发包。
+华为刷手机 //使用线上稳定版的rom，bug较少，测试验证问题可以减少rom带来的影响
+
+
+dump crash联系服务端增加NLP产品并协助测试
+
+NLP:
+	多厂商适配（旭东，双荣）
+	网络定位和权限的对话框（维灿，万振，双荣）
+	dumpcrash（建章）
+	service状态dump（雨庆）
+	采集、反馈、云控（建章）
+	push接入（双荣）
+	util整理，看看跟FLP一样的怎么处理（万振
+
+
+
+
+historicalTrack QA测试:
+  测试demo协助分析
+  istoricalTrack QA测试问题处理，bug解决
+  前已经测试完成(共9个bug，其中4个rom问题，3个已解决，1个QA操作流程错误，1个by design)
+
+DR QA测试:
+  测试问题协助分析
+  DR测试，mate8上pdr概率绑定失败  //flp 被省电模式杀死，关闭系统省电模式后解决
+  DR测试, mate8 pdr上报 update接口不起作用 //确认是手机rom问题
+
+厂商case：
+  高铁开到泰安，在车站停下的时候，看见高德地图的定位飘来飘去好几次 //先走cache定位，后来走在线定位，导致小范围的跳点。cache定位时，每20s强制走一次网络请求来更新cache，现在cache使用策略设计如此，考虑要不要更新cache策略
+  华为运动健康 疑问，解答跟踪， //由开放平台给出回复
+
+其他：
+  fused engine 串讲会 
+  ODPS 串讲会
+  AR 串讲会
+  采购手机制式错误，联系处理解决 (已经寄回去更换，下周与供应商发货)
+  采购手机，确定rom需求，并联系华为刷rom (由于采购手机有一台制式错误，刷rom延后)
+
+  
+case:
+  高德地图，打开后总是停留在上次定位的位置，过一会儿才同步到当前//flp返回位置均正确，怀疑amap客户端缓存了上一次GPS位置，客户端人员分析无法确定原因，我本地无法复现，需要联系华为或者QA来协助复现
+  导航时，位置不动，实际上的位置已经离当前位置有2km了 //amap未使用flp，线上amap 无log，因此需要华为通过GPSlog 协助分析问题。
+  高德地图高负载问题, // cpu使用率过高，联系华为提供 method trace 文件分析问题。
+  com.autonavi.minimap:LBSconnectionservice thread limit //淘宝push 服务异常启动的线程过多造成的，802版本已经将此包下线。
+	
+  HTC报人在台湾，位置显示在郑州 //NLP海外数据库线下训练算法和大陆不同，导致定位数据库差异，已经手动修正错误位置，但是训练算法未统一
+  高德地图 定位不准（新增舆情问题）//一个月前定位日志查不到，服务端拿到相关日志，分析结果是地铁wifi问题，预计三月底解决
+  nlp跳点过滤问题分析 //连续两个纯基站定位，而且时间小于45s，会被视为定位抖动，过滤掉
+  运动健康报告，高德地图SDK在海外无地图显示 //新版地图sdk 默认关闭了海外地图加载，需要通过设置来打开，此问题由商务回复
+  qualcomm 报flp1.6.3在 sdk23 设备上不能拿到nlp位置查看权限发现没有任何权限 //1.6.3上没有动态权限检查模块，需要替换成1.8.x或者更新版本。
+  
+重构测试：
+  重构评测会议，安排优先测试历史轨迹和 DR，geofence延后
+  historicalTrack： QA串讲，以及相关问题确认
+  historicalTrack: 协助QA 设计测试case。
+  historicalTrack: DR 测试用例评审
+  historicalTrack：协助测试解决测试demo的问题
+  historicalTrack：修改测试评审中发现的问题并提交新版本
+
+1. 删除pdr
+2. request remove 修改判断 uid 再回调gnss status
+3. 增加条数限制
+4. request remove 名字
+5. destory()
+
+重构：
+flp test 修改包名后升级
+flp test 字体颜色不对问题分析解决
+flp 集成后 permission申请失败问题分析//Permission 包使用的API错误 + Context对象错误
+flp 集成后 offline 崩溃问题确认
+flp集成其他相关工作
+flp 主工程集成后 自测 以及问题修复
+
+case:
+DTS2017010601282 高德地图定位显示慢 //跳点过滤，导致20s没有位置返回，定位失败
+华为: cdma 3G情况下 sid问题确认
+
+其他：
+converity问题处理
+专利 相关问题处理以及技术交底书撰写
+性能分享会
+坐标插件转换进度跟踪 //下发通道年后会投入开发, 编译器内部评审内部流程摸清，暂时只能使用网上公开版本。
+
+
+重构:
+geofence trace整理、提交新版本
+历史轨迹：配合集成增加const变量
+flp test逻辑梳理、现有问题修改、代码整理、javadoc wiki补齐
+flp test测试demo开发 自测
+flp hardware和主工程增加getStatus方法
+flp test 协调各相关模块增加getStatus接口，并且接入各模块// 还有NLP 和 主工程相关模块没接入
+主工程模块集成编译问题排查
+flp状态机review
+反馈代码review
+
+其他:
+参加NLP问题排查 分享会
+华为NLP 功耗问题复查
+华为运动健康备案问题跟进 //答案涉密，由商务统一回复
+华为运动健康ployline问题跟进 //由开放平台唐旭东负责回复，已经建议华为升级最新的sdk
+
+
+两点：
+无用信息不要打到aar包里
+主工程反射调用的，修改包名、变量名、变量类型 static->非static 要同步给我
+
+重构：
+flp鉴权模块代码白名单、加密方法、DB基础模块接入以及问题整理修复完成
+flp鉴权模块将白名单判断修改成同步方式，已经完成并自测通过
+flp鉴权模块 修改validateKey逻辑，更好的支持多APP访问
+flp鉴权模块 网络库接入，并且自测完成
+flp鉴权模块log、trace、javaDoc、基础模块接入完成
+flp主工程整理，可以编译通过并测试
+历史轨迹trace整理完成
+历史轨迹更改接口，去掉ConstGlobal的访问改由参数传入
+历史轨迹适配最新的trace规范，并且整理完成，提交新版本
+crash log上传相关代码梳理，加入重构后的主工程
+flp调度中心review
+
+
+重构：
+ 历史轨迹代码review以及问题修改
+ 历史轨迹trace接入，类图、文档、javadoc修改 //已经完成并提测
+ flp 鉴权模块逻辑梳理以及代码修改
+ 
+坐标转换插件:
+ 代码准备 整理makefile //已经找到相应代码，并且编译通过
+ 与江雄确认编译器以及编译的大概流程//已经拿到编译器可执行版本，并且编译通过。
+ POI搜索、路径规划、TBT 大概的工作流程梳理学习。
+ 联编代码 geofence、POI搜索、路径规划 文件名、函数名修改，多余代码删除
+ 联编代码鉴权模块开发
+ 代码编译后占用内存较大，整理代码删除全局变量 //整理后用12字节 
+
+case:
+ 设置中定位模式无法切换到网络定位模式
+ 开启地理位置拍照时，照片定位显示便宜
+ 协助赵洋分析 低功耗导航 位置不更新问题
+
+其他：
+ 华为业务应用类软件安全需求规格书 填写
+ nexus 6P 三星S7 刷rom
+ 梳理geofence相关专利点并与法务交流。
+
+下周:
+ geofence 需要permission模块完成后 来统一修改新要求。
+ crash上传模块打个包
+ 鉴权模块重构
+
+
+坐标转换插件:
+ 申请文党修改，编译细节讨论
+ 江雄 接口细节确认
+ 高德鉴权方式确认，并整理文档 //高德给华为一个认证key，下发插件前华为将key发送给FLP做鉴权，成功后下发插件。
+ 代码准备
+ 李江雄协调联编 编译器以及使用方法。
+ 低功耗导航协助赵洋测试
+
+重构:
+ 历史轨迹模块依赖接入以及架构整理
+ 历史轨迹 Database接入基础模块
+ 重构历史轨迹：测试demo搭建完成
+ 重构: 历史轨迹代码提交
+ flp sdk 和定位sdk问题讨论
+ 雨庆 pdr 测试demo搭建支持 
+ flp调度中心讨论
+ 发现 pdr batching模式不成功问题协调雨庆解决
+
+ 
+用户case分析:
+ 公司内部人员反馈 无法定位问题跟进 //无log，跟测试人员沟通注意事项后，复测重现问题
+ 上海华为反馈：高德地图定位不准，相差2-3公里 //cache定位错误
+ 高德地图等着等着等着，自己偏移了 //cache定位错误
+
+其他:
+ Converity问题解决 14个已经完成。
+ binder 获取调用者uid 研究
+
+ 把历史轨迹的几个 const 从sdk flpconst里面拿出来
+ 整理log 必须有if(D)
+	   
+	   
+重构
+历史轨迹: 对外依赖屡清、设计review、工程以及测试demo搭建 完成
+历史轨迹：需求确认完成：砍掉PDR调用相关代码
+历史轨迹: 架构整体设计完成
+历史轨迹: 多用户逻辑梳理以及开发完成，总体进度40%
+FLP调度中心: 设计review 
+FLP调度中心: flp geofence 集成测试支持
+pdr：重构设计讨论以及review
+VDR: 重构设计review
+协调支持 batching测试手机: 最新updata包验证
+
+flp case:
+ 运动健康，台湾地区使用高德地图的轨迹整体偏移问题跟踪处理//高德台湾地图使用84坐标系，已建议运动健康用开放平台定位sdk API 来判断是否需要进行坐标转换
+ MAH导航提示信号弱 //收不到GPS位置，怀疑是gps问题
+ MAH首次打开高德地图定位提示失败，再点定位才成功。//网络不好没有网络位置，GPS搜星比较慢造成
+ MAH导航过程中定位不准   //GPS 跳点
+ 一加: 待机过程中的疑问支持回答
+	  
+坐标转换插件: 
+    和江雄讨论编译细节，梳理问题，准备讨论风险	
+
+	converity问题
+	历史轨迹重构开发
+
+ 历史轨迹需求
+李江雄修改
+
+能否编译成.o文件（不是可执行文件）
+.o文件后续封装可不可以
+加密由华为提供合不合理
+
+不能封装的话鉴权怎么办？ 
+平台不一样都要去重新编译么?
+
+P6
+1）在专业领域中，对公司职位的标准要求、政策、流程等从业所必需了解的知识理解深刻，能够和经理一起探讨本岗位的产出和任务，并对经理具备一定的影响力；
+2）对于复杂问题的解决有自己的见解，对于问题的识别、优先级分配有见解，善于寻求资源解决问题；也常常因为对于工作的熟练而有创新的办法，表现出解决复杂问题的能力;
+3）可独立领导跨部门的项目；在专业方面能够培训和教导新进员工。
+
+P7
+1）在专业领域，对自己所从事的职业具备一定的前瞻性的了解，在某个方面独到，对公司关于此方面的技术或管理产生影响；
+2）对于复杂问题的解决有自己的见解，对于问题的识别、优先级分配见解尤其有影响力，善于寻求资源解决问题；也常常因为对于工作的熟练而有创新的办法，表现出解决问题的能力;
+3）可独立领导跨部门的项目；能够培训和教导新进员工；
+4）是专业领域的资深人士；
+5）行业外或公司内培养周期较长。
+
+
+
+重构:
+flp调度中心 初始化 讨论
+重构geofence: 测试demo开发测试
+调度中心 flp geofence 集成测试支持
+重构flp_test 工程搭建以及代码梳理
+flp sdk测试问题支持
+讨论flp 重构后续工作安排
+历史轨迹代码梳理
+历史轨迹设计文档、模块图、流程图整理
+
+信号源和hardwareFLP事件分发，没有new 对象，容易造成冲突问题分析讨论
+runtimePermission 弹窗问题 处理
+协调支持 batching测试手机
+
+
+
+
+DR文档 流程梳理
+
+
+重构 geofence 软件方案开发 测试
+重构 geofence 硬件方案增加 84和02坐标支持
+重构 geofence: 自测以及bug fix
+重构 geofence: javaDoc 以及文档补充
+重构 geofence: 重构工程创建以及代码提交
+重构 geofence: flp sdk 添加geofence新接口
+重构 geofence: 文档、类图、wiki整理
+重构 geofence: 代码review
+重构 geofence： review 问题修改
+重构 geofence: 测试demo开发
+
+低功耗导航:与明发确认geofence参数
+低功耗导航:协助明发解决 导航demo geofence 不能下发的bug
+
+刘沙部分 converity问题解决
+泽干 converity问题处理以及提交代码
+专利问题沟通。
+
+mock 模块重构
+
+geofence代码review问题整理
+showdemo 修改
+测试demo
+测试 case
+
+
+
+测试一下硬件和软件实现方案
+提交代码
+
+检查一下timer轮询
+studio 問題處理 
+sync volatile 问题处理
+
+提测要提供什么东西？
+要不要测试多用户？ 需要service
+
+低功耗导航
+geofence低功耗导航:华为rom问题协助跟踪。
+坐标转换插件:下发方案以及接口确认
+
+重构
+flp 重构review
+重构 flp sdk和 indoor 模块代码review
+重构 geofence 设计文档整理 
+重构 geofence GeofenceHardwareManager代码整理，增加注释，去掉无意义代码
+重构 geofence 第三方APP下发参数保存代码实现
+重构 geofence 主键有packageName改为UID
+重构 geofence flp sdk 接口开发完成
+重构 geofence 整体架构设计、文档、问题梳理
+重构 geofence:设计review
+重构 geofence:hardware 下发部分开发
+
+
+其他:
+converity问题 处理
+converity问题 处理完成 提交merge
+converity问题 代码review
+argus平台迁移 协助测试
+crash上报 合并主线，提交mergerequest
+
+
+低功耗导航：商务已经给华为发了测试版，等待华为确认硬件问题。
+坐标转换插件:下发方案已经确认，接口细节需要进一步讨论确定。
+重构geofence 问题已经确认，下周开发完成 ，保证进度 
+
+vivo 问题:
+vivo log 协助分析
+vivo问题讨论会
+
+尴尬
+
+重构：
+flp 调度中心重构讨论
+nlp 重构讨论
+工程编译以及geofence模块现有代码梳理
+
+flp test activity 怎么办
+crash log上传 综合成一个？
+下周主要重构保证进度
+geofence 讨论
+
+geofence低功耗导航:
+志龙开发协助
+amap 定位sdk代码梳理 确认amap service不会影响geofence下发
+模拟fence触发 测试代码开发
+flp geofence bug修复,接口联调已经完成。
+华为新手机 硬件geofence调试以及问题反馈
+硬件geofence不触发，和明发一起分析原因
+硬件层已经调通，但是手机自动重启进入fastboot模式需要华为解决
+坐标转换插件方案与华为同步
+
+发布临时版本，还需要什么流程么
+
+其他:
+华为 flp 1.8.0.13 crash 问题分析
+华为 flp 高德地图高功耗问题，分析确认与flp无关
+亚楠 coverity 问题分析 
+gradle 编译培训会
+
+coverity 重要 多线程sync volatile nullPoint  2/0 
+
+
+flp crash：
+建挺修改后sdk自测
+MAH crash argus 不展示问题追踪解决
+crash log 修改逻辑后文档整理
+crash log显示上传timeout ，服务端查看到上传数据，手机中crash文件未删除 问题追踪
+crash log显示上传timeout，服务端查看到上传数据，手机中crash文件未删除 问题已经明确，等待确认是否做修改。
+crash 上传 上传79个log后只展示2条 问题追踪确认
+crash 上传 argus 页面只展示18条问题追踪确认
+
+Geofence 低功耗导航:
+Geofence 低功耗导航方案以及接口确认讨论
+华为硬件geofence讨论
+amap 定位sdk 工程编译以及 代码逻辑梳理
+geofence低功耗导航 方案 amap定位sdk 相关代码逻辑修改
+geofence低功耗导航 方案 amap定位sdk 修改后代码自测：可以下发到硬件接口，硬件接口返回可以触发PendingIntent返回
+geofence低功耗导航 方案 客户端开发支持
+
+重构：
+flp sdk 修改整理
+flp sdk 重构讨论
+GNLP代码review
+NLP 重构讨论
+amap定位sdk  amapService流程了解
+
+其他:
+VIVO报高德地图网络定位不准，深圳出差准备
+vivo网络位置不准问题与vivo确认相关测试环境测试细节以及相关测试准备工作
+高德百度腾讯 地图对比测试
+一加11-05使用高德地图时，无法定位的问题 
+
+重构：
+flp重构模块讨论
+flp 模块梳理以及代码review，建议以及问题整理
+NLP 模块梳理以及代码review
+FLP重构讨论
+
+其他：
+flp case分析
+华为硬件Geofence实施策略讨论会议
+java crash和 jni crash抓取方法研究学习
+
+crash 上传:
+crash log galaxy读取数据库失败问题跟踪 解决
+crash log系统增加本地文件最多保存10M的限制
+crash log系统文档输出以及测试支持
+crash log测试问题分析跟踪解决
+
+crash log 解决问题：
+当前系统时间早于Crash文件时间后，相同crash 不在进行记录
+新的cras文件生成后，旧crash文件全部更为新文件时间
+crash zip压包上传后，crash 文件未删除
+
+FLp解决问题:
+使用今日头条软件，人在东莞，定位在中山，连续刷新几次依然在中山
+定位/定位不准/天气时钟城市定位不准】人在上海，却定位到石景山区
+com.amap.android.ams持锁导致待机功耗较高，请分析定位
+
+crash log剩余待解决的问题：
+crash log上传压缩包大小与服务端不同（周一 建挺解决）
+Flp crash 上传log过多不能全部上传 （周一 建挺提供接口，FLP自己解决）
+crash 保存满以后，发生crash不触发上传 （建挺提供接口后，FLP自己解决）
+测试上报log argus 不展示问题(丰煦 宇龙分析)
+
+跨部门 协作问题：需求不同 wifi下上传， 循环crash，相同的crash，每10分钟会记录上传一次 (全部上传和只上传一个压缩包) (压缩包大小不同)（提供了返回接口，返回false就不触发上传）
+
+
+
+flp代码  
+java 以及 jni crash 怎么抓
+NLP代码
+垃圾回收，调优，网络编程
+服务端 服务器搭建，以及工程化测试
+AI
+算法
+
+
+crash log上报系统联调
+crash log上报系统增加崩溃次数限制，防止循环crash以后不停上报
+crash log上报系统Aone 自动提bug功能接口不对问题分析
+crash log系统修改逻辑：仅在wifi下上传
+crash log galaxy读取数据库失败问题跟踪
+crash log上报系统提测以及测试支持
+
+离线三期 geofence相关需求以及问题讨论
+华为case分析
+flp 重构模块梳理以及代码review
+
+品质提升计划:
+  flp 代码 review
+  flp 代码  时序图、类图整理
+  flp 代码关键点整理
+
+crash log上报系统：
+  建挺新sdk接入flp,增加接口
+  crash log上报系统增加动态权限检查
+  上传log，协助服务端联调
+  crash log上报系统自测
+  crash log上报系统测试case设计
+  过程中出现的问题以及处理结果:
+    1. 华为P9(androidN)每次启动系统都打印很多dump log (dump thread 信息带来的log，正常现象)
+    2. 当出现native堆被破坏的情况，目前无法收集。(这个问题目前没有解决方案)
+    3. 华为P9(androidN)在非主线程执行SIG测试，会造成anr(这是测试的一个极端情况，正常情况下不会主动发信号，因此不解决)
+    4. 在网络不好的情况下，上传log耗时过长，活造成ANR(由于测试demo的逻辑错误导致，已经修复)
+    5. 64位so校验不对 (已经修改，但是没给到FLP)
+    6. 总是生成堆错误 的crashlog 问题(接口定义不明确造成，已经修复)
+
+其他:
+  华为case分析
+  geofence相关讨论
+
+
+
+
+
+dic渠道号、当前城市、topActivity实现
+统一增加 动态权限检查 
+
+动态加载so的路径
+动态权限检查添加
+自测
+测试项书写
+服务端联调 以及移交QA测试
+
+
+flp crash log上报：
+flp crash log上报系统了解沟通
+flp crash log上报系统接口实现
+crash log上报系统URL 加密问题讨论 以及实现
+crash上报系统 demo测试
+utdid sdk接入
+crash log上报系统URL 鉴权问题，沟通解决
+crash log上报系统zip包上传以及服务端联调 服务端可以收到收据
+协助建挺解决 6.0上log不能上传bug
+crash log url 加密算法 C化 问题讨论
+crash 制造 方法讨论以及实现
+flp增加 制造crash 测试activity
+
+flp:
+大花 小米手机fip不能打开GPS问题
+flp质量提升计划 讨论
+flp 代码 review
+
+其他:
+studio 导出jar 包研究
+
+flp crash log上报剩余工作:
+
+
+jekens 打包编号
+jekens 打包名字
+淘宝ID
+
+
+任宇龙: 服务端接口   
+包建挺: sdk 支持  页面展示 开发量
+刘丰煦: 
+郝孟涛: argus 实时展示 
+
+展示开发量
+sdk开发量
+
+geofence:
+	geofence 手机休眠后策略制定增加 RTC wakeup 策略
+	geofence 增加NotificationResponseTime 和LoiteringDelayMs 参数支持
+	geofence 测试
+	geofence 测试问题修复
+	Geofence 自测报告整理
+
+FLP:
+	测试:FLPApiTest anr问题分析
+	测试:【Android N】History 历史轨迹功能， batch 模式无法批量返回 问题分析
+	华为:运动健康高功耗问题分析
+	flp crash log上报系统了解以及代码学习
+
+geofence:
+geofence讨论会议，以及意见总结
+功耗测试流程搭建
+addgeofence增加 靠PengdingIntent返回值
+geofence 增加gps调用策略
+与测试和产品沟通，确认测试周期和流程
+离线cell代码测试
+geofence却认乐视需求
+geofence 补充测试case 以及自测
+补充showdemo说明以及 hardware activity说明文档
+geofence 自测结果报告整理
+
+flp
+华为 destory以后 getinstance 不能拿到 ON_CONNECTED的信号问题 sdk 华为发版验证
+调用NlpManager requestNlp 然后再removeNlp 以后NLP定位不停止 问题协助复现 测试
+华为问题会议
+
+
+策略：gps 拿不到位置 就同时拿NLP在线的位置，如果半径过大 就没办法
+      如果NLP在线位置半径过大，就开gps ，如果两个无返回，就无办法
+
+
+geofence:
+	geofence 测试以及 问题总结
+	geofence测试项整理
+	showdemo杀掉以后被geofence唤醒，地图上直接显示fence当前状态
+	新旧sdk monkey测试
+	flp sdk destory exception问题分析解决
+	flp sdk getInstance  时序问题分析
+	geofence 增加gps调用策略
+	geofence相关问题讨论
+
+flp:
+	华为 destory以后 getinstance 不能拿到 ON_CONNECTED的信号问题分析
+	通过NlpManager访问NLP remove以后仍然定位
+
+其他：
+	功耗测试流程摸索
+
+功耗测试流程摸索(建章)
+
+新sdk 旧FLP mokey测试
+新sdk 新FLP monkey测试
+
+
+geofence:
+	基站离线下载新代码review 以及问题需求分析
+	离线数据一周内不能重复下载问题沟通解决
+	离线数据gzip不能解压，
+	不能搜到当前基站问题沟通
+	搜索离线数据效率太低问题分析
+	离线数据解析工具增加 瓦片边界显示在google
+	flp sdk release
+	geofence 研发时间沟通确认
+	geofence 文档整理
+	geofence测试case梳理
+	geofence 增加wgs84和gcj02坐标类型的支持
+	AR代码学习,以及在geofence 中的应用研究
+	geofence 实地测试
+
+其他：
+	协助泽干测试乐视geofence
+
+是否弹窗告诉用户 打开wifi ？？
+
+Geofence相关功能，sdk新接口，flp实现架构逻辑，均已实现，并通过简单的自测，目前还需要在更多的场景下去测试，然后去优化一部分参数和逻辑。
+前段时间发现的服务端测试网数据问题，已经修复。并不会对geofence造成影响。
+
+9月9号-9月14号:
+    客户端离线基站现有问题 开发完成(泽干)
+    设计geofece测试case,自测问题修复(建章)
+    低功耗AR策略测试以及在geofence中应用(建章)
+    功耗测试流程摸索(建章)
+	新sdk测试(建章)
+		 
+9月14号-9月16号:
+    客户端离线基站现有问题 自测完成(泽干)
+    同步测试基站离线问题(建章)
+    gpsgeofence功耗测试自测(建章)
+	 
+9月16号-9月23号:
+    低功耗AR接口开发完成(刘沙)
+    同步测试接口(建章)
+    增加离线基站功能，(建章)
+	功耗测试对比测试报告以及效果测试报告(建章)
+	
+预计geofece可以随1.8.1发版，发版所需要的测试时间，需要测试人员来估计        
+
+离线三期无意外情况下预估10月中旬开发完成，还需要一定的测试时间. 离线wifi可以很大程度上减少网络访问，增加精确度(相比于离线cell)，在geofence可以获取一定的功耗收益，
+但是时间上 flp、sdk整合的时间冲突，需要评估一下是否要提高一下做离线三期的优先级。
+		 
+测试人员测试 功耗 稳定性
+
+
+测试activity围栏状态显示优化
+geofence文档补充整理
+R tree 算法研究
+不同R tree算法性能测试以及比较
+R tree使用策略设计实现
+
+华为：不停的注入位置导致系统功耗大 问题分析
+
+fence resume 策略设计
+fence resume 实现
+fence保存策略调整：fence保存时 增加将每个APP的fence个数和 PendingIntent个数保存到本地文件中
+flp service正常运行过程中，进行升级，fence数据删除功能
+geofence log 保存功能整理
+测试activity展示所有围栏以及当前状态
+R tree代码研究
+保存PendingIntent 其他方式研究
+开机广播和APP卸载广播，不能同时接受问题研究
+
+1.5.4版本编译
+历史轨迹调用StartBatching 和 requestHistoricalTrackUpdates 顺序错误问题分析解决
+历史轨迹调用 StartBatching 和 requestHistoricalTrackUpdates 顺序错误 给华为发包，测试
+
+Geofence
+APP卸载、重装或者清除数据以后移除其所注册的所有围栏
+flp清除数据以后清除所有围栏
+基站离线数据解析工具
+基站离线数据分析以及问题反馈
+PendingIntent保存在LocationManager 问题研究
+geofence 数据保存策略设计以及实现
+Geofence更新策略：由相同的ID直接返回 修改为 相同ID新参数替换旧参数
+
+PendingIntent resume之前 APP进行 add remove 逻辑设计问题
+resume的时候要考虑临时list处理(旧的不能替换新的，并且需要检查是不是pendingIntent里面的 key 比fences多 或者少，如果多就删掉多余的key，证明存储文件出错，如果少就记录错误)
+FLP首次启动的时候一定要主动从framework拿一次位置来获取PengdingIntent 并且对围栏进行调度
+maxfence maxPendingIntent 功能更新
+
+
+
+Geofence数据保存
+1.PendingIntent 保存以及恢复
+2.fence数据保存以及以及恢复
+3.保存策略
+4.快速恢复策略 -- 在恢复以前没有add 和remove操作
+5.慢速恢复策略 -- 在恢复以前有add和remove操作
+
+
+flp:
+运动健康进行坐标转换失败问题分析
+geofence:
+基站离线代码流程梳理
+基站离线增加可以下载周围49个瓦片数据功能
+使用Geofence APP杀掉以后被PengdingIntent叫起来功能验证
+showdemo 增加被Geofence启动的功能
+Geofence增加hardware Geofence 支持
+
+离线基站需求:可以下载任意瓦片离线基站数据，并且可以从中获取位置。
+1.现有离线使用方式，是必须打开NLP才能使用离线功能，离线功能可以与NLP解除绑定，避免造成不需要的功耗。
+2.下载数据可以提供简单接口，给定geohash或者 location就可以下载所需瓦片基站数据。
+3.在获取离线位置的时候，不提供任何参数，可以直接获取位置。
+
+
+
+1. 預到問題,工作上的瓶頸
+   很顺利啊
+2. 需要組織的幫助
+   跟咱们组大神学习的机会(管理上，技术上)
+3. 自我提升的目標
+   阅读论文，掌握一两种算法的原理以及实现过程
+4. 個人上半年KPI review
+
+AR > wifi离线
+   
+
+flp:
+MAH FLP启动时序问题跟踪分析
+CopyOnWriteArrayList remove exception问题分析解决
+
+Geofence:
+看基站离线功能代码
+
+MAH手机不能调用startBatching问题跟踪反馈
+Geofence测试 数据整理
+Geofence 测试以及策略调整
+Geofence 基站离线功能 增加验证
+vivo geofence功耗测试demo准备
+
+
+
+增加fence以后第一个调度点策略
+
+flp
+Runtime permission check 在nexus5上弹窗crash
+权限弹窗，每个权限同时只存在一个
+
+华为MAH 1.6.5FLP service 不能调用startbatching问题分析
+华为FRD手机 低功耗轨迹记录 轨迹丢失问题跟踪
+oppo flp 不启动问题分析
+高德地图 反复打开导致不能定位问题分析
+离线加密crash问题分析
+
+
+Geofence
+mock 工具 使用和 位置调用策略 交流 
+
+vivo
+不想加入flp
+sdk destroy解决办法
+
+过期
+loop周期调整架构搭建
+
+位置来源策略
+主动：系统GPS、硬件FLP、NLP在线、基站离线、Wifi离线、室内
+被动：FLP综合位置、历史轨迹、系统GPS、系统NLP、系统FLP
+
+source 选择策略
+
+location 处理策略(连续多个点判定结果相同再确认？？)
+响应 系统位置设置
+
+测试
+db存储
+
+flp
+ -华为FRD手机 batching 定不到位问题分析
+ -多线程操作List 和 Map exception的问题分析解
+
+geofence
+  -Geofence第一期 测试工具demo 修改
+  -Geofence remove策略调整
+  -Geofence第一期 位置来源策略设计 实现
+  -轮询周期策略实现
+
+
+1.geofence第一期DB存储策略开发 7/4-7/6 80%
+2.Geofence第一期测试工具开发 7/7-7/11 100%
+3.Geofence第一期效果测试 7/12-7/15 30%
+
+
+
+vivo
+项目正在追flp fifo问题，帮忙测试了一下fifo当前的情况
+协助vivo 分析sap问题
+
+flp
+mock代码合并进去
+
+geofence第一期开发
+  sdk新接口开发 初步测试完成
+  fence存储策略 设计开发 完成
+  PendingIntent 存储策略 正在实现 80%
+
+
+1.geofence第一期DB存储策略开发 7/4-7/6 80%
+2.Geofence第一期测试工具开发 7/7-7/11 100%
+3.Geofence第一期效果测试 7/12-7/15 30%
+
+
+
+git 不区分大小写问题研究解决
+runntime permission check 在nexus 上 crash 问题分析解决
+flp balance power和 low_power 模式下会访问硬件FLP
+
+vivo 测试
+完成剩余测试报告
+vivo gps图标不消失问题
+SAP 驾车室内仍然不推算轨迹
+
+Geofence 架構梳理 & Porting
+架构搭建，下周继续第一期的开发
+
+
+
+历史轨迹DB 数据库降级，删除所有历史数据
+flp service 6.0动态权限检查增加弹窗
+	动态权限申请需要activity，service不支持权限申请，找到一个方法，因此有需要的可以参考flp里面的代码RuntimePermissionCheck
+	
+vivo问题追踪
+   确认有3个issue 6.0上不会支持，这三个issue并不影响功能，因此不再追踪
+   总体issue已经解决， 剩余的需要等待vivo 代码升级完成，还没有发版时间
+   
+geofence
+  补充geofence 文档：离线下载策略，geofence应用。
+  sdk原有geofence代码移植到flp中。
+  
+kml解析相关学习
+
+
+
+
+Jianzhang:
+1. 軟硬件兼容設計 6/20-6/24 0%
+2.Geofence 架構梳理 & Porting 6/27-7/1 0%
+
+
+6月20号前VIVO开始beta测试；
+6~7月vivo进行测试；
+8月份基于Xplay7发版
+
+flp 华为 QC版本 历史轨迹开发以及发版
+flp增加 调用者显示的 activity
+  flp 测试activity文档更新
+历史轨迹DB存储偶然抛出空指针异常问题分析解决
+
+vivo新包验证 --LocationManager.requestLocationUpdates访问framework的fused的provider，无位置返回值
+vivo问题反馈
+geofence 架构设计文档
+  sdk现有geofence文档
+  新geofence设计文档
+
+  
+  
+  专利：
+  基于多边形 的 地理位置数据 抽稀 算法
+
+Jianzhang:
+1. SDK Geofence 架構研究梳理 6/6-6/8 100%
+2.8996 SAP 測試 6/12-6/17 0%
+
+
+
+google NLP TravelDetection代码学习
+geofence 架构设计文档
+flp 华为 QC版本 历史轨迹开发以及发版
+vivo问题反馈
+flp增加 调用者显示的 activity
+
+
+vivo问题追踪
+vivo AR 驾车时间测试
+vivo 测试报告 增加场景加对比图
+vivo 测试报告 增加结论判断
+2s  sensor采样率
+
+gms ios geofence调研
+SDK Geofence 架構研究梳理
+
+1.VIVO Hardware 測項開發驗證 - 5.23-5.27 50%
+2.SDK Geofence 架構研究梳理 - 5.30-6.3 0%
+3.VIVO 820 Project 追蹤
+
+
+SDK Geofence 架構研究梳理 有没有推荐
+看google怎么做的，服务端相关数据，ios geofence接口怎么做的
+多geofence 怎么处理
+
+看运动健康源码分析进入室内缺少轨迹的问题
+flp sdk 连接flp service 超时问题讨论 昆明发包
+
+高通PDR VDR 测试
+VIVO Issue :
+  Total: 23   Fix : 13   can not fix : 3   Open : 7 (6 vivo&Qualcomm + 1 indoor)
+  
+  测试报告情况:
+  基础测项：已完成（AR 、 History 、indoor、 NLP 、OTA、sdk ），未完成（FWK、GF）
+  效能测项：已完成（PDR、NLP），未完成（VDR）
+
+未完成原因：Qualcomm 问题导致测试不能进行。
+
+高通反馈问题追踪
+  sensor采样率不对
+  VDR 轨迹不上报
+  2s更新的问题
+  framework 的flp 不上报
+  fifo 不上报
+  geofence 不能进出
+
+1. OTA Maintain policy 維護 - 5.9-5.13 100%
+2. VIVO Hardware 測項開發驗證 - 5.16-5.20 0%
+3. VIVO 820 Project 追.蹤
+4. 华为运动健康问题跟踪
+
+
+需要正式网的URL  郑娜
+
+
+
+
+运动健康画的轨迹不准确问题分析
+运动健康画的轨迹不准确问题复现
+framework绑定flp相关代码学习
+aMap.moveCamera fatal问题反馈
+vivo测项整理
+1.6.3版本 vivo PDR效能测试
+
+1.6.3 和1.6.2NLP代码合并冲突
+
+
+
+历史轨迹 测项 修改推动vivo 支持 flush 接口
+
+
+OTA 服务器与客户端通信过程梳理
+历史轨迹专利
+
+1. VIVO Hardware 測項開發驗證 - 4.25-4.29 0%
+2.     OTA Maintain policy 維護 - 5.2-5.4 100%
+3.    QC 歷史軌跡 Batching 開發 - 5.5-5.6 100%
+4. VIVO 820 Project 追蹤
+5. 华为运动健康问题跟踪
+
+AR   做
+CTS vivo做
+FWK  做		
+GF 做
+History 做
+Indoor  做
+NLP  不做
+OTA 做
+permission  做
+SDK 做
+SYS 做
+兼容性 不做
+mokey 做
+
+performance
+FLP.PDR.VDR 要做
+indoor 由室内去出
+NLP不做
+
+1.测哪个版本 1.6.3？
+2.QC底层提供什么能力？
+power souce period flag displacement
+3.测项问题：
+AR却少手动硬件测项
+CTS GTS相关APK
+fwk的自动化测项有没有case
+indoor测项是什么
+NLP的测项和case都有么 以前是怎么测的
+OTA服务端还没屡清
+permission测试相关
+sdk自动化测项有没有case
+SYS怎么测
+兼容性还做不做
+
+NLP不用做
+FLP PDR VDR
+
+performance
+indoor 相关
+NLP 相关
+VDR QC有VDR么？ 
+
+
+FLP AutoTC 開發(history)
+mock bug功能
+OTA问题梳理
+OTA代码学习
+运动健康偶然情况下，不调用flp问题
+vivo测试以及问题反馈
+ 1.调用FusedLocationHardware.injectDiagnosticData接口以后 造成framework 重启
+ 2.FusedLocationHardware.flush()接口不起作用
+ 3.Fifo模式下，缓存点不上报
+ 4.addGeofence以后没有收到  onGeofenceAdd的回调
+ 5.进出围栏功能未成功
+
+ota代码梳理  下载那一块
+通信协议
+双方鉴权
+增加的内容放在哪？
+cdn操作问题
+OTA Maintain policy 維護	10 个工作日	2016年4月29日	2016年5月12日	李建章-高德      70%
+SDK 測項開發 - Geofence	10 个工作日	2016年4月15日	2016年4月28日	刘昆明,李建章-高德  0%
+SDK 測項開發 - History	10 个工作日	2016年4月1日	2016年4月14日	李建章-高德			70%
+华为运动健康问题跟踪	0 个工作日	2016年2月15日	2016年2月15日	李建章-高德  		50%
+QC hardware 驗證Activity	0 个工作日	2016年4月11日	2016年4月11日	李建章-高德   100%
+
+ 
+
+
+JianZhang	History Tracking/OTA/VIVO/Geofence				
+方向		项目					描述								计划时间	优先级	人员安排	目标
+定位客户端	HistoryTracking			Huawei History Tracking develop		2w			A		JianZhang	GPS only、高通芯片的历史轨迹
+            VIVO 客戶支持			處理VIVO後續project Issue, 反饋		X			A		JianZhang	保证8996  8997上线	
+			FLP AutoTC 開發			收集自動測試項目增加到jenkins
+									自動化系統(history/ Geofence)		3w			A		JianZhang	历史轨迹每个厂商都至少有一组mock数据。地理围栏自动化测项
+			OTA Maintain policy 	維護OTA 機制上線(產品發放維護)		2w			B		JianZhang	郭志龙，先跟服务端沟通，保证OTA上线自己来完成。5月前上线 （能不能让产品去发版）
+			Geofence-Power Saving	Geofence 省電機制開發				5w			B		JianZhang	通过网络位置，如果围栏很远可以先不检查。有可能涉及到离线网络数据。
+
+
+
+•	2016 Q2 Task review
+•	預期達到的目標
+•	個人希望投入的領域
+	學習服務端的應用 (1. HistoryTracking, 2. fence, 3. data collection)
+•	未來工作遇到的瓶頸
+	溝通: 客戶, Indoor
+•	其他
+
+Dear JianZhang:
+    關於2016 Q2下季任務的方向如下,  下周我們約時間了解任務需求.
+•	    FLP 團隊目標: 項目
+0.重点客户技术支持
+Vivo FLP
+4.OTA升级
+通过OTA可以在部分厂商预装的FLP进行更新；
+    
+JianZhang	History Tracking/OTA/VIVO/Geofence					target
+方向		项目			描述	计划时间	优先级	人员安排	
+定位客户端	HistoryTracking				Huawei History Tracking develop		2w	A	JianZhang	1. GPS only landing  2. QC Batching 調適上 VIVO 使用
+			VIVO 客戶支持				處理VIVO後續project Issue, 反饋		X	A	JianZhang	1. 8996/8976 FLP 量產
+			FLP AutoTC 開發				收集自動測試項目增加到jenkins 
+										自動化系統(history/ Geofence)		3w	A	JianZhang	1. History Mock 自動測項上線 jenkins  2. Geofece 自動測項 jenkins
+			OTA Maintain policy 維護	OTA 機制上線(產品發放維護)			2w	B	JianZhang	1. OTA 佈局上線, 含server 端. 5m 前上線
+			Geofence-Power Saving		Geofence 省電機制開發				5w	B	JianZhang	pre-condition:  NLP Offline 定位支持 DB 數據   1. 低功耗fence. 目標, 提升20 % 省電 compare with Pure GPS only.
+
+
+1.传感器：FusedAR、eCompass4CAR、AR二期、方向、PDR  @李隽颖 已经牵头组织建群，并且共享了部分资料；
+2.Android技术
+3.定位新技术和算法
+4.云控和采集
+
+
+
+Mock SDK TC Support - Sharing    %0
+History 純軟方案 - GPS only    %100
+Location Settings FLP Hardware 相应策略    %100
+Huawei Issue 处理    %100
+
+ 
+Jianzhang:
+1. Mock System build-up 2.29-3.4 5 100%
+2. 歷史軌跡測項開發與驗證 & 數據抓取 3.7-3.11 80%
+
+测试项
+硬件接口测试文档 以及 mock文档整理
+
+flp service 增加 硬件接口测试的activity，包括架构，实现，初步测试，文档
+增加数据mock功能，mock数据采集存储模块已经完成，具体mock架构和逻辑已经清楚，具体实现还需要一定时间
+1.6.0发版，对华为最新的 batchingGPS相关包，进行一系列测试，在没加flush，会出现一些问题，加上flush并不存在，可能存在的风险和问题已经反馈给华为。
+完善了历史轨迹测试case
+
+mock数据的实现
+华为问题反馈
+
+	Jianzhang:
+	1. 歷史軌跡整合(新旧平台) 測項整理 2.17-2.17 1 100%
+	2. Hardware interface 測項整理 2.18-2.19 2 100%
+	3. Mock System build-up 2.22-2.26 5 30%
+	
+	
+
+	
+
+Jianzhang:
+1. EVA 歷史軌跡V2 聯調   70%
+2. FLP支持GPS batching  50%
+3. GPS/Wifi/MTK-PDR fusing  30%
+
+1. EVA/Knight 歷史軌跡整合(新旧平台) 1.18-1.21 100%
+2. GPS/Wifi/MTK-PDR fusing 1.22-1.27 4 100%
+3. Huawei Issue 处理  80%
+
+1.FLP初版代码学习以及融合算法验证   10%
+  20150801--20150915
+  工作
+  a.flp代码学习
+  b.测试demo代码编写以及基本功能验证
+  c.M实验室融合算法调试验证
+  d.Huawei融合算法调试验证
+  目标：
+  a.理解整个flp代码的逻辑架构，可以修改完善增加其中的部分功能。
+  b.测试demo可以实现不同算法的轨迹融合功能
+  c.融合算法验证，可以按照要求进行测试，并且反馈问题给算法相关人员，并跟踪解决问题
+ 合作方:
+  华为算法团队以及m实验室算法团队: 通过对flp集成算法的验证,有效的反馈了算法中的问题，并跟踪反馈问题，最终保证了flp项目的按时上线
+
+  
+2.华为NEXT项目低功耗历史轨迹功能实现  15%
+  20150916--20151117
+  a.低功耗历史轨迹v0.1需求讨论
+  b.华为手机rom验证:batching PDR功能验证,GPS定位慢验证，华为融合算法逻辑验证
+  c.功能开发:数据存储，低功耗逻辑梳理以及实现，数据上报，测试demo开发
+  d.测试issue处理以及运动健康开发支持
+  目标:
+  a.与华为方面讨论清楚，低功耗历史轨迹的具体需求，受益情况以及验证方法
+  b.发现华为rom的bug，并及时反馈跟踪解决问题
+  c.实现了预先讨论的所有需求，并持续改进达到了更好的受益效果
+  d.及时处理测试反馈的问题，并且支持华为运动健康方面的开发，保证了运动健康的开发进度
+  合作方:
+  华为海思:flp和手机rom相关性很高，合作过程中沟通有效，解决问题及时，保证了第一版低功耗历史轨迹按时完成
+  华为运动健康团队:作为低功耗历史轨迹的使用方，开发时间紧张，问题多，双方加班加点完成运动健康了对低功耗历史轨迹的支持。
+  
+3.华为EVA项目低功耗历史轨迹功能实现 25%
+  20151118--20151221
+  a.flp历史轨迹v0.2需求确认
+  b.新系统框架设计以及搭建，解决第一版的遗留问题：进程间大数据通信会崩溃，频繁读取轨迹效率低，运动健康整公里播报不能实现，记录过程中系统不能及时唤醒，非步行状况下轨迹不准
+  c.功能开发:android SQLite数据库开发，contentProvider进程间通信实现，播报管理模块实现，AR算法验证以及调用逻辑实现，Log功能完善
+  d.flp sdk开发：增加新的API，并保证与上一版的兼容性
+  e.测试issue处理以及运动健康开发支持
+  目标:
+  a.分析第一版历史轨迹存在的问题，并与华为方面沟通确认解决问题的方法以及具体工作分配。确认运动健康方面提出的所有需求，并细化实现过程。
+  b.新架构搭建过程中，能够有效的解决需求中提出的所有问题，为开发做准备
+  c.开发能够按时有效的完成。
+  d.及时处理测试反馈的问题，并且支持华为运动健康方面的开发，保证了运动健康的开发进度
+  合作方:
+  华为海思:合作过程中沟通有效，解决问题及时，保证了第二版低功耗历史轨迹按时完成
+  华为运动健康团队:作为低功耗历史轨迹的使用方，开发时间紧张，问题多，双方加班加点完成运动健康了对低功耗历史轨迹的支持。
+  
+  
+4.华为KNIGHT项目低功耗历史轨迹功能实现 20%
+  20151222--20160229
+  a.flp历史轨迹v0.3需求确认
+  b.batchingGPS功能验证以及bug反馈
+  c.功能开发:batchingGPS功能测试demo开发,完善架构保证与0.2版本的兼容性
+  d.测试issue处理以及运动健康开发支持
+  目标:
+  a.与华为GPS团队和海思团队确认好相关接口定义，保证v0.2和v0.3的兼容性，明确其他相关需求以及实现的目标。
+  b.测试过程中及时反馈华为以及博通存在的问题
+  c.开发能够按时有效的完成。
+  d.及时处理测试反馈的问题，
+  合作方:
+  华为海思:合作过程中沟通有效，解决问题及时，保证了满足第三版低功耗历史轨迹功能的基础上同时兼容上一版。
+  华为GPS团队:有效沟通和测试支持，保证batchinggps功能的上线
+  
+5.mtk FLP项目功能实现 20%
+  20160301--20160331
+  a.mtk手机FLP功能测试以及bug反馈
+  b.室内算法验证
+  c.meizu产品化功能开发
+  目标:
+  a.mtk flp正常运行，有效的反馈手机rom的bug，并提交跟踪反馈
+  b.保证室内算法正常运行，反馈bug
+  c,魅族相关产品正常上线
+  合作方：
+  mtk北京:能够有效合作解决测试过程的问题
+  
+6.例行工作  10%
+  1.技术分享、专利撰写
+  2.开发文档规范化，自测流程化
+  3.例行开发支持工作
+  目标:
+  1.完成有意义的技术分享
+  2.跟随项目完成相应的文档和自动化测试用例
+  3.技术支持有效解决问题
+
+
+算法
+NLP
+定位sdk
+数据采集
+map maching
+flp
+重构
+  
+传感器算法
+机器深度学习
+
+1、	在与华为 MTK等厂商合作项目中继续开发工作
+2、	继续在android开发，系统架构上继续研究学习
+3、	定位原理，原有定位代码学习
+
+
+
+
+MTK手机
+
+eva 和 night 发版问题
+batching gps开发
+knight 手机
+
+recording start
+
+问题：兼容性测试需要新版amap，发版时间问题？
