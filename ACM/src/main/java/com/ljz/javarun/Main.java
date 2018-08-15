@@ -8,6 +8,35 @@ public class Main {
 
 
     public static void main(String[] args) {
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (Main.class) {
+                    try {
+                        System.out.println("thread start");
+                        Thread.sleep(1000);
+                        System.out.println("thread end");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+//        synchronized (Main.class) {
+            try {
+                System.out.println("join start");
+                thread.start();
+                thread.join();
+                System.out.println("join finish");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+//        }
+
+
         HashMap map = new HashMap();
         A a = new A();
         String str1 = "dfee";
@@ -20,7 +49,7 @@ public class Main {
 //        System.out.println(map.get(a));
 //        a.b();
         int[] arr = {1, 2, 3, 4, 5, 6};
-        System.out.println("index:" + get(arr, 0, arr.length-1, 7));
+        System.out.println("index:" + get(arr, 0, arr.length - 1, 7));
     }
 
 
