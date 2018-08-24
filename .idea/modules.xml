@@ -4,9 +4,12 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ACM/ACM.iml" filepath="$PROJECT_DIR$/ACM/ACM.iml" />
       <module fileurl="file://$PROJECT_DIR$/annotations/AnnotationTest.iml" filepath="$PROJECT_DIR$/annotations/AnnotationTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JniTest/JniTest.iml" filepath="$PROJECT_DIR$/JniTest/JniTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/JniTest.iml" filepath="$PROJECT_DIR$/JniTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/JniTest/JniTest-JniTest.iml" filepath="$PROJECT_DIR$/JniTest/JniTest-JniTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SelfAndroid.iml" filepath="$PROJECT_DIR$/SelfAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/happycolor/happycolor.iml" filepath="$PROJECT_DIR$/happycolor/happycolor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/litto/litto.iml" filepath="$PROJECT_DIR$/litto/litto.iml" />
     </modules>
   </component>
 </project>

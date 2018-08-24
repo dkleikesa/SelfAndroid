@@ -3,17 +3,17 @@ mount -t nfs -o nolock 192.168.1.101:/opt/imx6dq/rootfs /system/aa/
 mount -t vmhgfs .host:/ /mnt/hgfs
 mount -t nfs -o nolock 192.168.1.101:/home/xuansongtao/rootfs /home/lijianzhang/nfs
 showmount
-mount -l	//·şÎñÆ÷¶Ë ¿´¹ÒÔØÇé¿ö
-df -a  		//¿Í»§¶Ë¿´¹ÒÔØÇé¿ö
+mount -l	//æœåŠ¡å™¨ç«¯ çœ‹æŒ‚è½½æƒ…å†µ
+df -a  		//å®¢æˆ·ç«¯çœ‹æŒ‚è½½æƒ…å†µ
 
 printk("lijianzhang---%s video_options %d=%s \n",__FUNCTION__,i,video_options[i]); //lijianzhang
 
 
-wget  //´Ó»¥ÁªÍøÏÂÔØÎÄ¼ş
+wget  //ä»äº’è”ç½‘ä¸‹è½½æ–‡ä»¶
 
-dmesg //ÏÔÊ¾¿ª»úĞÅÏ¢
+dmesg //æ˜¾ç¤ºå¼€æœºä¿¡æ¯
 
-//½«system ¹ÒÔØÎª¿É¶Á
+//å°†system æŒ‚è½½ä¸ºå¯è¯»
 busybox cp eGalax_Touch_Screen.idc  Ft5x0x_Touch_Screen.idc
 ro.sf.lcd_density=240
 
@@ -110,14 +110,14 @@ setenv bootargs console=ttymxc0,115200 init=/init rw androidboot.console=ttymxc0
 setenv bootargs ${bootargs} root=/dev/mmcblk3p2 rw 
 setenv bootargs ${bootargs} androidboot.mode=charger
 
-u-boot>setenv etnaddr 11:22:33:44:55:66 //ÊÇÉèÖÃ°å×ÓµÄmacµØÖ·¡£
-u-boot>setenv ipaddr 192.168.1.133	//ÊÇÉèÖÃ°å×ÓµÄIPµØÖ·¡£
-u-boot>setenv serverip 192.168.0.55	//ÊÇÉèÖÃÌá¹©ÄÚºËÏÂÔØµÄ·şÎñÆ÷IPµØÖ·¡£
-u-boot>setenv gatewayip 192.168.1.1 	//ÉèÖÃÍø¹Ø
-u-boot>setenv netmask 255.255.255.0 	//ÉèÖÃ×ÓÍøÑÚÂë
-setenv name				//É¾³ı±äÁ¿
+u-boot>setenv etnaddr 11:22:33:44:55:66 //æ˜¯è®¾ç½®æ¿å­çš„macåœ°å€ã€‚
+u-boot>setenv ipaddr 192.168.1.133	//æ˜¯è®¾ç½®æ¿å­çš„IPåœ°å€ã€‚
+u-boot>setenv serverip 192.168.0.55	//æ˜¯è®¾ç½®æä¾›å†…æ ¸ä¸‹è½½çš„æœåŠ¡å™¨IPåœ°å€ã€‚
+u-boot>setenv gatewayip 192.168.1.1 	//è®¾ç½®ç½‘å…³
+u-boot>setenv netmask 255.255.255.0 	//è®¾ç½®å­ç½‘æ©ç 
+setenv name				//åˆ é™¤å˜é‡
 u-boot>saveenv
-//·ÉË¼¿¨¶û°å×Ó ¿ÉÓÃtftp  
+//é£æ€å¡å°”æ¿å­ å¯ç”¨tftp  
 bootdelay=3
 baudrate=115200
 serverip=192.168.1.101
@@ -161,33 +161,33 @@ sudo dd if=boot.img of=/dev/sdb1; sync
 sudo dd if=system.img of=/dev/sdb5; sync
 sudo dd if=recovery.img of=/dev/sdb2; sync
 
-//±àÒëÕû¸öandroid
+//ç¼–è¯‘æ•´ä¸ªandroid
 export PATH=~/myandroid/bootable/bootloader/uboot-imx/tools:$PATH
 export CROSS_COMPILE=~/myandroid/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
 export ARCH=arm
 source build/envsetup.sh
 lunch 8
 make -j4
-// ±àÒëuboot
+// ç¼–è¯‘uboot
 cd ~/android40/bootable/bootloader/uboot-imx
 export ARCH=arm
 export CROSS_COMPILE=~/android40/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
 make distclean
 make mx6q_sabresd_android_config
 make
-//±àÒë boot.img
+//ç¼–è¯‘ boot.img
 source build/envsetup.sh
 lunch sabresd_6dq-user
 make bootimage
 make recoveryimage
-//±àÒëkernel
+//ç¼–è¯‘kernel
 export PATH=~/android40/bootable/bootloader/uboot-imx/tools:$PATH
 cd ~/android40/kernel_imx
 export ARCH=arm
 export CROSS_COMPILE=~/android40/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
 make imx6_android_defconfig
 make uImage
-//±àÒëÉı¼¶°ü
+//ç¼–è¯‘å‡çº§åŒ…
 source build/envsetup.sh
 lunch 8
 make otapackage
@@ -205,7 +205,7 @@ make snod
 make systemimage - system.img
 make userdataimage - userdata.img
 make ramdisk - ramdisk.img
-make snod - ¿ìËÙ´ò°üsystem.img 
+make snod - å¿«é€Ÿæ‰“åŒ…system.img 
 make bootimage
 
 am start -n com.android.camera/com.android.camera.Camera 
@@ -215,7 +215,7 @@ am start -n com.android.music/com.android.music.MediaPlaybackActivity -d Story.m
 adb pull  /tmp/recovery.log
 adb  push c:\adb\recovery /
 
-gpio debugÏà¹Ø
+gpio debugç›¸å…³
 cat /sys/kernel/debug/gpio
 echo "3"> /sys/class/gpio/export
 echo "out"> /sys/class/gpio/gpio34/direction
@@ -223,70 +223,70 @@ echo "in"> /sys/class/gpio/gpio3/direction
 echo "0"> /sys/class/gpio/gpio34/value
 echo "3"> /sys/class/gpio/unexport
 
-ÆøÑ¹ mpl3115
-echo "1">>/sys/devices/virtual/input/input2/enable	Ê¹ÄÜÉè±¸
-/home/linaro/getevent /dev/input/event2		¶ÁÈ¡Êı¾İ
+æ°”å‹ mpl3115
+echo "1">>/sys/devices/virtual/input/input2/enable	ä½¿èƒ½è®¾å¤‡
+/home/linaro/getevent /dev/input/event2		è¯»å–æ•°æ®
 
-sht15Ïà¹Ø
-cat /sys/class/hwmon/hwmon0/device/humidity1_input Êª¶È
-cat /sys/class/hwmon/hwmon0/device/temp1_input ÎÂ¶È
+sht15ç›¸å…³
+cat /sys/class/hwmon/hwmon0/device/humidity1_input æ¹¿åº¦
+cat /sys/class/hwmon/hwmon0/device/temp1_input æ¸©åº¦
 
-LSM330DÏà¹Ø
-ÍÓÂİÒÇ
+LSM330Dç›¸å…³
+é™€èºä»ª
 /sys/devices/platform/imx-i2c.0/i2c-0/0-006b/enable_device
 /sys/devices/platform/imx-i2c.0/i2c-0/0-006b/input/input3/event3/
 /dev/input/event3
-3D¼ÓËÙ¶È
+3DåŠ é€Ÿåº¦
 /sys/devices/platform/imx-i2c.0/i2c-0/0-0018/enable_device
 /sys/devices/platform/imx-i2c.0/i2c-0/0-0018/input/input4/event4/
 /dev/input/event4
 
-rtcÉè±¸ÎÄ¼ş
+rtcè®¾å¤‡æ–‡ä»¶
 cd /sys/class/rtc/rtc0/ 
 cat date  
 cat time
 
 mag3110
-echo "1">>/sys/devices/virtual/input/input1/enable		Ê¹ÄÜÉè±¸
-/home/linaro/getevent /dev/input/event1		¶ÁÈ¡Êı¾İ
+echo "1">>/sys/devices/virtual/input/input1/enable		ä½¿èƒ½è®¾å¤‡
+/home/linaro/getevent /dev/input/event1		è¯»å–æ•°æ®
 
-3D¼ÓËÙ¶ÈĞ£×¼
+3DåŠ é€Ÿåº¦æ ¡å‡†
 cd /sys/devices/virtual/input/input2
 echo "3">>position
 
-¹âºÍ½Ó½ü´«¸ĞÆ÷Éè±¸ÎÄ¼ş
+å…‰å’Œæ¥è¿‘ä¼ æ„Ÿå™¨è®¾å¤‡æ–‡ä»¶
 /sys/devices/virtual/input/input3
-echo "1">>enable_als    //Ê¹ÄÜ
+echo "1">>enable_als    //ä½¿èƒ½
 echo "1">>enable_ps
-cat lux_adc //¹âÇ¿
-cat raw_adc //¾àÀë
+cat lux_adc //å…‰å¼º
+cat raw_adc //è·ç¦»
 
-³äµçÉè±¸ÎÄ¼ş
+å……ç”µè®¾å¤‡æ–‡ä»¶
 /sys/class/power_supply
 
-µçÔ´¹ÜÀíÉè±¸ÎÄ¼ş
+ç”µæºç®¡ç†è®¾å¤‡æ–‡ä»¶
 /sys/devices/platform/bq24103-charger.1
 
-¹â´«¸ĞÆ÷ Ä¿Â¼
+å…‰ä¼ æ„Ÿå™¨ ç›®å½•
 cat init.freescale.rc
 /sys/devices/virtual/input/input4
 
-sd¿¨Ïà¹ØÄ¿Â¼
+sdå¡ç›¸å…³ç›®å½•
 cd /sys/class/mmc_host/
 /sys/devices/platform/sdhci-esdhc-imx.1/ 
  busybox mount /dev/block/mmcblk1p1 /extsd/ 
- sd¿¨ÅäÖÃ¹ÒÔØ
+ sdå¡é…ç½®æŒ‚è½½
 cat /etc/vold.fstab 
  
-bdÏà¹ØÉè±¸ÎÄ¼ş
+bdç›¸å…³è®¾å¤‡æ–‡ä»¶
 /sys/devices/platform/bd_power/enable_rnss
 echo "1">>/sys/devices/platform/bd_power/enable_rdss
 
-watch dog Ïà¹ØÎÄ¼ş
+watch dog ç›¸å…³æ–‡ä»¶
 /dev/watchdog
 /sys/class/watchdog
 
-gs2965Ïà¹Ø
+gs2965ç›¸å…³
 cd /sys/class/spi_master/spi0/spi0.0
 
 echo "0 10">> /sys/class/spi_master/spi0/spi0.0/gs2965
@@ -301,7 +301,7 @@ echo "200 0aa4">> /sys/class/spi_master/spi0/spi0.0/gs2972_write
 echo "on">>/sys/class/spi_master/spi0/spi0.0/close_screen
 echo "off">>/sys/class/spi_master/spi0/spi0.0/close_screen
 
-GS2971Ïà¹Ø
+GS2971ç›¸å…³
 cat /sys/devices/platform/gs2971.0/gs2971_modes
 cat /sys/devices/platform/gs2971.0/gs2971_mode
 echo "1280x720P50">>/sys/devices/platform/gs2971.0/gs2971_mode
@@ -313,11 +313,11 @@ cat /sys/devices/platform/gs2971.0/gs2971_format
 echo "UYVY">>/sys/devices/platform/gs2971.0/gs2971_format
 echo "GENERIC_16">>/sys/devices/platform/gs2971.0/gs2971_format
 
-wm8524 ÉùÒôÖ±²¥Ïà¹Ø
+wm8524 å£°éŸ³ç›´æ’­ç›¸å…³
 echo "1">>/sys/devices/platform/imx-snd-gs2972.0/direct_config
 echo "0">>/sys/devices/platform/imx-snd-gs2972.0/direct_config
 
-µçÔ´Ä£¿é×´Ì¬¼à²â
+ç”µæºæ¨¡å—çŠ¶æ€ç›‘æµ‹
 cat /sys/devices/platform/pwr_detect/status
 
 ./mxc_v4l2_tvin.out -ol 0 -ot 0 -ow 1280 -oh 720
@@ -329,7 +329,7 @@ cat /sys/devices/platform/pwr_detect/status
 fastboot flash boot \\192.168.0.199\lijianzhang\myandroid\out\target\product\sabresd_6dq\boot.img
 fastboot flash boot \\192.168.1.101\lijianzhang\myandroid4.2.2\out\target\product\sabresd_6dq\boot.img
 fastboot flash boot \\192.168.1.101\lijianzhang\myandroid\out\target\product\sabresd_6dq\boot.img
-fastbootÓÃ·ÖÇøÃû³Æ
+fastbootç”¨åˆ†åŒºåç§°
 ptn 0 name='mbr' start=0 len=1
 ptn 1 name='bootloader' start=2 len=2046
 ptn 2 name='boot' start=16384 len=16384
@@ -352,28 +352,28 @@ ptn 5 name='recovery' start=32768 len=16384
 
 ro.sf.lcd_density=240
 :set fileformat=unix
-·µ»Ø x120 y1400 Ö÷Ò³x360 y1400 ²Ëµ¥x500 y1400
+è¿”å› x120 y1400 ä¸»é¡µx360 y1400 èœå•x500 y1400
 
-ÆÁÄ» x539 y959
+å±å¹• x539 y959
 
 
-¿´µ±Ç°CPUÆµÂÊ /sys/kernel/debug/clock/osc_clk/pll1_sys_main_clk/pll1_sw_clk
+çœ‹å½“å‰CPUé¢‘ç‡ /sys/kernel/debug/clock/osc_clk/pll1_sys_main_clk/pll1_sw_clk
 
 printk("----------------------\n ldb_i2c probe\n -------------------\n");
 LOGE("---%s,%s %d---\n",__FILE__,__FUNCTION__,__LINE__);//lijianzhang
 printk("---%s,%s %d---\n",__FILE__,__FUNCTION__,__LINE__);//lijianzhang
 
       
-¼¼ÊõÖ§³Ö   ÑîÈğ  139 0244 1699
+æŠ€æœ¯æ”¯æŒ   æ¨ç‘  139 0244 1699
    
-ÉèÖÃÒÔ¼°±àÒë
- ./ltib -m selectype	ÖØĞÂÑ¡ÔñCPUÀàĞÍ
- ./ltib -m config	 ´úÂëÅäÖÃ 
- ./ltib 		 ´úÂë±àÒë
- ./ltib ¨Cm listpkgs 	ÁĞ³öËùÓĞltibµÄ°ü
-./ltib -m prep -p <package name>	È¡³ö°üµÄ´úÂë·ÅÔÚ./ltib/rpm/BUILD/
-./ltib -m scbuild -p kernel-3.0.35	ĞŞ¸Ä´úÂëºóÖØĞÂ±àÒë°ü
-./ltib -m scdeploy -p <package name>    ½«Ò»¸ö°ü°²×°µ½rootfsÖĞ
+è®¾ç½®ä»¥åŠç¼–è¯‘
+ ./ltib -m selectype	é‡æ–°é€‰æ‹©CPUç±»å‹
+ ./ltib -m config	 ä»£ç é…ç½® 
+ ./ltib 		 ä»£ç ç¼–è¯‘
+ ./ltib â€“m listpkgs 	åˆ—å‡ºæ‰€æœ‰ltibçš„åŒ…
+./ltib -m prep -p <package name>	å–å‡ºåŒ…çš„ä»£ç æ”¾åœ¨./ltib/rpm/BUILD/
+./ltib -m scbuild -p kernel-3.0.35	ä¿®æ”¹ä»£ç åé‡æ–°ç¼–è¯‘åŒ…
+./ltib -m scdeploy -p <package name>    å°†ä¸€ä¸ªåŒ…å®‰è£…åˆ°rootfsä¸­
 
 ./ltib -m scbuild -p kernel
 ./ltib -m scbuild -p u-boot-v2009.08
