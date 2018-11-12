@@ -1,2 +1,2 @@
-include ':happycolor', ':litto'
-include  /*':annotation-annotations', ':annotation-processors', ':BYDMonitor', 'testjars',*/':JniTest', ':ACM'
+include ':happycolor', ':BYDMonitor'
+include  /*':annotation-annotations', ':annotation-processors',  'testjars',*/':JniTest', ':ACM'

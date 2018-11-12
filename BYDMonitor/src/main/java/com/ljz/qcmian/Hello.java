@@ -2,6 +2,7 @@ package com.ljz.qcmian;
 
 import android.util.Log;
 
+import com.ljz.qcmian.encrypt.RSAEncrypt;
 import com.ljz.qcmian.utils.LLog;
 import com.ljz.qcmian.utils.LogFactory;
 import com.ljz.qcmian.utils.Utils;

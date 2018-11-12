@@ -9,9 +9,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ACM" />
+            <option value="$PROJECT_DIR$/BYDMonitor" />
             <option value="$PROJECT_DIR$/JniTest" />
             <option value="$PROJECT_DIR$/happycolor" />
-            <option value="$PROJECT_DIR$/litto" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

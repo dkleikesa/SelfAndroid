@@ -1,5 +1,11 @@
 package com.ljz.qcmian.utils;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Base64;
 
 /**
@@ -7,14 +13,6 @@ import android.util.Base64;
  */
 
 public class Utils {
-    //    public static String getProcessID() {
-//        String pid = "";
-//        String pName = ManagementFactory.getRuntimeMXBean().getName();
-//        if ((pName != null) && (pName.indexOf('@') > 0)) {
-//            pid = pName.substring(0, pName.indexOf('@'));
-//        }
-//        return pid;
-//    }
     public static String getProcessID() {
         return String.valueOf(android.os.Process.myPid());
     }
@@ -29,6 +27,22 @@ public class Utils {
 
     public static byte[] base64Decode(byte[] buff) {
         return Base64.decode(buff, Base64.DEFAULT);
+    }
+
+    public static String getDeviceID(Context context) {
+        try {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                String id = telephonyManager.getDeviceId();
+                if (TextUtils.isEmpty(id)) {
+                    id = telephonyManager.getSimSerialNumber();
+                }
+                return id;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
 }

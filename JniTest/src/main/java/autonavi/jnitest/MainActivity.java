@@ -1,17 +1,24 @@
 package autonavi.jnitest;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.io.File;
@@ -25,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     public static String TAG = "MMMainActivity";
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
-            "android.permission.WRITE_EXTERNAL_STORAGE"};
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.ACCESS_COARSE_LOCATION"};
     ClassLoader parentClassLoader;
     ClassLoader appClassLoader;
     DexClassLoader dexClassLoader;
@@ -109,6 +117,26 @@ public class MainActivity extends AppCompatActivity {
                 setClassLoadProxy(dexClassLoader, appClassLoader);
                 Log.e("TTT", "btn2 onClick");
                 Toast.makeText(MainActivity.this, new Test().TTT, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        RadioGroup mSwitchMapRadioGroup = (RadioGroup) findViewById(R.id.rg_switch_map);
+        String provider = "amap";
+        int index = 1;
+        if(provider.equals("amap")){
+            index = 0;
+        }
+        ((RadioButton)mSwitchMapRadioGroup.getChildAt(index)).setChecked(true);
+        mSwitchMapRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId == R.id.rb_map_amap){
+                    Log.i(TAG, " check amap");
+                }else {
+                    Log.i(TAG, " check tencent");
+                }
+
             }
         });
     }
@@ -232,8 +260,6 @@ public class MainActivity extends AppCompatActivity {
 //    static {
 //        System.loadLibrary("native-lib");
 //    }
-
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
 //        Log.e(TAG, "1 dispatchTouchEvent");

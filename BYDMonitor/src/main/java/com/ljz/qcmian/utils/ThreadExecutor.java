@@ -6,15 +6,17 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ThreadExecutor {
-    private static final Handler mHandler;
+    private static final ScheduledExecutorService mExecutor;
 
     static {
-        HandlerThread handlerThread = new HandlerThread("net");
-        handlerThread.start();
-        mHandler = new Handler(handlerThread.getLooper());
+        mExecutor = Executors.newScheduledThreadPool(3);
     }
 
     /**
@@ -25,7 +27,8 @@ public class ThreadExecutor {
      * @param action 回调
      */
     public static void post(Runnable action) {
-        mHandler.post(action);
+        mExecutor.execute(action);
+        mExecutor.schedule(action, 0L, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -35,20 +38,7 @@ public class ThreadExecutor {
      * @param delayMills 延时
      */
     public static void postDelayed(Runnable action, long delayMills) {
-        mHandler.postDelayed(action, delayMills);
+        mExecutor.schedule(action, delayMills, TimeUnit.MILLISECONDS);
     }
-
-    /**
-     * 移除回调
-     *
-     * @param action 回调
-     */
-    public static void removeCallbacks(Runnable action) {
-        if (action == null) {
-            return;
-        }
-        mHandler.removeCallbacks(action);
-    }
-
 
 }

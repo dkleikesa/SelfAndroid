@@ -44,7 +44,36 @@
             android:layout_marginBottom="10dp"
             android:text="Button" />
 
+        <RadioGroup
+            android:id="@+id/rg_switch_map"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="10dp"
+            android:showDividers="middle">
+
+            <RadioButton
+                android:id="@+id/rb_map_amap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="地图切换为amap" />
+
+            <RadioButton
+                android:id="@+id/rb_map_tencent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="地图切换为tencent" />
+        </RadioGroup>
     </LinearLayout>
+
+
 
 
     <!--<include layout="@layout/content_main"/>-->
