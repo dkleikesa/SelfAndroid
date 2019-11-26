@@ -84,8 +84,21 @@ viewModel：业务逻辑，以及数据绑定相关，同时比presenter更轻�
     * Activity：主要是管理工作，负责整个页面生命周期、LaunchMode等等
     * window：SurfaceFlinger处理的最小单位，它包含了一个Surface,Android的图像输出主要由两个canvas和opengl（所有View都是通过canvas画到Window的Surface上），两者都是讲图像画到Surface上，再交给SurfaceFlinger，才能显示在屏幕上，Window有个Z轴概念，用来管理显示层级。
     * View: 最小的显示控制单位，可以生成一个矩形区域的显示内容，最终会画到Window的Surface上，然后显示在屏幕上。
+14. Touch事件分发的基本流程 Activity->window->DecorView->ViewGroup->View
+    touch事件分发过程中的重要方法：dispatchTouchEvent（分发事件） onInterceptTouchEvent(拦截事件仅存在于ViewGroup，Activity和view没有)  onTouchEvent(消费事件)   
+    
+activity 分发   
+
+![activity_touch](./activiy_touch.png)
+ 
+viewGroup分发:
+
+![viewGroup_touch](./viewGroup_touch.png)
+
+15. touch事件消费，事件传递到最顶层的View后，来决定是否消费，如果不消费才有其父控件再去消费
+ 
+ 
 14. view、ViewGroup 渲染流程
-15. touch事件分发
 16. 热修复、插件化原理
 17. RN、weeks、小程序基本原理
 18. LRU

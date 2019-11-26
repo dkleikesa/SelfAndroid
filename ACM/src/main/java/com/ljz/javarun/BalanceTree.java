@@ -1,5 +1,8 @@
 package com.ljz.javarun;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * 平衡二叉树判断问题：
  * 判断是否为平衡二叉树，平衡二叉树特性为左子树和右子树的深度差不超过1，并且其每个子树必须都为平衡二叉树。
@@ -40,6 +43,38 @@ public class BalanceTree {
         }
     }
 
+    //广度优先遍历
+    private static int getDepthNode(TreeNode root) {
+        if (root == null)
+            return 0;
+
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        int dep = 0;
+
+        while (!queue.isEmpty()) {
+            dep++;
+
+            int sizeOfLevel = queue.size();
+            int index = 0;
+
+            //遍历一层
+            while (index < sizeOfLevel) {
+                index++;
+
+                //每遍历一层，便将下一层所有值放到队列中。
+                TreeNode node = queue.poll();
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+
+            }
+        }
+        return dep;
+    }
 
     //    private static int getDepthWithBalance(TreeNode root) {
 //        if (root == null) return 0;
@@ -78,7 +113,7 @@ public class BalanceTree {
         }
     }
 
-
+    //深度优先遍历
     private static int getDepth(TreeNode root) {
         if (root == null) {
             return 0;
@@ -94,5 +129,6 @@ public class BalanceTree {
             rnum = getDepth(root.right);
         }
         return Math.max(lnum, rnum) + 1;
+
     }
 }

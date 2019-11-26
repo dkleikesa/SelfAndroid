@@ -2,54 +2,57 @@ package com.ljz.javarun;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
 
 
     public static void main(String[] args) {
-
-        Thread thread = new Thread(new Runnable() {
+//        TwoSum.run();
+//        System.out.println(uncommonFromSentences("apple apple", "sour"));
+//        System.out.println(299 + " " + intToRoman(299));
+//        ReverseInteger.run();
+//        IntToRoman.run();
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (Main.class) {
+                while (true) {
+                    System.out.println("2222");
                     try {
-                        System.out.println("thread start");
                         Thread.sleep(1000);
-                        System.out.println("thread end");
-                    } catch (Exception e) {
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
-        });
+        }).start();
 
-//        synchronized (Main.class) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    System.out.println("3333");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+
+        while (true) {
+            System.out.println("1111");
             try {
-                System.out.println("join start");
-                thread.start();
-                thread.join();
-                System.out.println("join finish");
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
 
-//        }
-
-
-        HashMap map = new HashMap();
-        A a = new A();
-        String str1 = "dfee";
-        String str2 = new String(str1);
-        map.put(str1, "start");
-
-//        System.out.println(str2);
-//        System.out.println(map.get(str2));
-//        a.aa = "ee";
-//        System.out.println(map.get(a));
-//        a.b();
-        int[] arr = {1, 2, 3, 4, 5, 6};
-        System.out.println("index:" + get(arr, 0, arr.length - 1, 7));
     }
 
 
@@ -86,15 +89,6 @@ public class Main {
             System.out.print("ee");
         }
     }
-
-
-/**
- *  问题：
- *  顺时针打印矩阵
- *  解析：
- *  按圈，每一圈分为上下左右4部分，分别打印，每打印一圈向内缩小，循环一直到最后一行。
- */
-
 
 }
 

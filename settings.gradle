@@ -1,2 +1,2 @@
-include ':happycolor', ':BYDMonitor'
+include ':happycolor', ':BYDMonitor', ':weixincachecleaner'
 include  /*':annotation-annotations', ':annotation-processors',  'testjars',*/':JniTest', ':ACM'
