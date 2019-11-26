@@ -1,92 +1,195 @@
-package com.qcmian.qrcode;
+package com.meituan.android.mrnmap.test;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-public class MainActivity extends AppCompatActivity {
+import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    // We want at least 2 threads and at most 4 threads in the core pool,
-    // preferring to have 1 less than the CPU count to avoid saturating
-    // the CPU with background work
-    private static final int CORE_POOL_SIZE = CPU_COUNT * 2;
-    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2;
-    private static final int KEEP_ALIVE_SECONDS = 30;
+import com.google.android.cameraview.CameraView;
+import com.google.zxing.Binarizer;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.LuminanceSource;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.PlanarYUVLuminanceSource;
+import com.google.zxing.RGBLuminanceSource;
+import com.google.zxing.Result;
+import com.google.zxing.common.HybridBinarizer;
+import com.meituan.android.mrnmap.test.utils.ThreadExecutor;
 
-    private static final ThreadFactory sThreadFactory = new ThreadFactory() {
-        private final AtomicInteger mCount = new AtomicInteger(1);
+import java.util.HashMap;
+import java.util.Map;
 
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "WeixinCache #" + mCount.getAndIncrement());
-        }
-    };
+import static android.graphics.Bitmap.Config.ARGB_8888;
 
-    private static final BlockingQueue<Runnable> sPoolWorkQueue =
-            new LinkedBlockingQueue<Runnable>(256);
-
-    /**
-     * An {@link Executor} that can be used to execute tasks in parallel.
-     */
-    public static final Executor THREAD_POOL_EXECUTOR;
-
-    static {
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
-                CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_SECONDS, TimeUnit.SECONDS,
-                sPoolWorkQueue, sThreadFactory);
-        threadPoolExecutor.allowCoreThreadTimeOut(true);
-        THREAD_POOL_EXECUTOR = threadPoolExecutor;
-    }
-
+public class ScanQRActivity extends AppCompatActivity {
+    CameraView cameraView;
+    ImageView cover;
+    Rect codeRect;
+    ImageView test;
+    EditText addr;
+    boolean hasResume = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
-        setContentView(R.layout.activity_main);
-        checkPermission(this);
-
-    }
-
-
-    private void checkPermission(Activity activity) {
-        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS,
-                Manifest.permission.ACCESS_NETWORK_STATE,
-                Manifest.permission.ACCESS_WIFI_STATE,
-                Manifest.permission.CAMERA
-        };
-        List<String> needRequest = new ArrayList<>();
-        for (String permission : permissions) {
-            int hasPermission = ContextCompat.checkSelfPermission(activity.getApplication(), permission);
-            if (hasPermission != PackageManager.PERMISSION_GRANTED) {
-                needRequest.add(permission);
+        setContentView(R.layout.activity_scan_qrcode);
+        initActionBar("扫码链接");
+        cameraView = findViewById(R.id.camera);
+        test = findViewById(R.id.test);
+        cover = findViewById(R.id.cover);
+        addr = findViewById(R.id.addr);
+        cover.post(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = Bitmap.createBitmap(cover.getMeasuredWidth(), cover.getMeasuredHeight(), ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                Paint paint = new Paint();
+                paint.setColor(Color.argb(150, 0, 0, 0));
+                canvas.drawRect(0, 0, cover.getMeasuredWidth(), cover.getMeasuredHeight(), paint);
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+                paint.setFlags(Paint.ANTI_ALIAS_FLAG);
+                paint.setColor(Color.TRANSPARENT);
+                codeRect = new Rect(cover.getMeasuredWidth() / 2 - 320, cover.getMeasuredHeight() / 2 - 320 - 150, cover.getMeasuredWidth() / 2 + 320, cover.getMeasuredHeight() / 2 + 320 - 150);
+                canvas.drawRect(codeRect, paint);
+                cover.setImageBitmap(bitmap);
             }
-        }
-        if (needRequest.size() <= 0) {
-            return;
-        }
+        });
+    }
 
-        ActivityCompat.requestPermissions(activity, needRequest.toArray(new String[needRequest.size()]), 32);
+    Runnable work = new Runnable() {
+        @Override
+        public void run() {
+            if (cameraView != null && hasResume) {
+                cameraView.takePicture();
+            }
+            ThreadExecutor.postMain(work, 500);
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hasResume = true;
+        cameraView.start();
+        cameraView.addCallback(new CameraView.Callback() {
+            @Override
+            public void onPictureTaken(CameraView cameraView, final byte[] data) {
+                super.onPictureTaken(cameraView, data);
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    int width = bitmap.getHeight();
+                    int height = bitmap.getWidth();
+                    float bi = (float) cover.getHeight() / cover.getWidth();
+                    float sc = (float) cover.getWidth() / width;
+                    int w, h;
+                    if (sc * height > cover.getHeight()) {
+                        w = width;
+                        h = (int) (width * bi);
+                    } else {
+                        w = (int) (height / bi);
+                        h = height;
+                    }
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    float scaleWidth = ((float) codeRect.width() / 2) / ((float) codeRect.width() / cover.getWidth() * w);
+                    matrix.postScale(scaleWidth, scaleWidth);
+
+                    bitmap = Bitmap.createBitmap(bitmap,
+                            (int) (((float) codeRect.top / cover.getHeight()) * h),
+                            (int) (width - (((float) (codeRect.left + codeRect.width()) / cover.getWidth()) * w)),
+                            (int) ((float) codeRect.width() / cover.getWidth() * w),
+                            (int) ((float) codeRect.height() / cover.getHeight() * h)
+                            , matrix, true);
+
+                    final Bitmap finalBitmap = bitmap;
+                    ThreadExecutor.postMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            test.setImageBitmap(finalBitmap);
+                        }
+                    });
+
+                    MultiFormatReader multiFormatReader = new MultiFormatReader();
+
+                    int[] pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
+                    bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+                    LuminanceSource source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), pixels);
+                    Binarizer binarizer = new HybridBinarizer(source);
+                    BinaryBitmap binaryBitmap = new BinaryBitmap(binarizer);
+
+                    Map hints = new HashMap();
+                    hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+
+                    Result result = multiFormatReader.decode(binaryBitmap, hints);
+
+                    ThreadExecutor.postMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            addr.setText(result.getText());
+                        }
+                    });
+
+                } catch (NotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        ThreadExecutor.postMain(work, 700);
 
     }
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        hasResume = false;
+        ThreadExecutor.removeCallbacksMain(work);
+        cameraView.stop();
+
+    }
+
+
+    protected void initActionBar(String title) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setCustomView(R.layout.actionbar);//设置自定义的布局：actionbar_custom
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM); //Enable自定义的View
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+
+            //title
+            if (!TextUtils.isEmpty(title)) {
+                TextView tv = actionBar.getCustomView().findViewById(R.id.tv_action_bar_title);
+                tv.setText(title);
+            }
+            ImageView back = actionBar.getCustomView().findViewById(R.id.back);
+            back.setVisibility(View.VISIBLE);
+            back.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ScanQRActivity.this.finish();
+                }
+            });
+        }
+    }
 }
