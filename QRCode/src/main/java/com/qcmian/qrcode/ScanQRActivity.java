@@ -1,61 +1,72 @@
-package com.qcmian.qrcode
+package com.qcmian.qrcode;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
-
-import com.google.android.cameraview.CameraView;
-import com.google.zxing.Binarizer;
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.LuminanceSource;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.NotFoundException;
-import com.google.zxing.PlanarYUVLuminanceSource;
-import com.google.zxing.RGBLuminanceSource;
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
-import com.google.zxing.common.HybridBinarizer;
-import com.qcmian.qrcode.R;
+import com.qcmian.qrcode.zxing.camera.CameraManager;
+import com.qcmian.qrcode.zxing.decoding.CaptureActivityHandler;
+import com.qcmian.qrcode.zxing.decoding.InactivityTimer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.Vector;
 
 import static android.graphics.Bitmap.Config.ARGB_8888;
 
-public class ScanQRActivity extends AppCompatActivity {
-    CameraView cameraView;
+public class ScanQRActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+    SurfaceView cameraView;
     ImageView cover;
     Rect codeRect;
     ImageView test;
     EditText addr;
     boolean hasResume = false;
 
+    private InactivityTimer inactivityTimer;
+    private boolean hasSurface;
+    private CaptureActivityHandler handler;
+    private Vector<BarcodeFormat> decodeFormats;
+    private String characterSet;
+    private boolean vibrate;
+    public static final String INTENT_EXTRA_KEY_QR_SCAN = "result";
+    private int needResult = 0;
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initActionBar("扫码链接");
+        requestPermissions(new String[]{"android.permission.CAMERA"}, 1);
+//        initActionBar("扫码链接");
+        CameraManager.init(getApplication());
+        hasSurface = false;
+        inactivityTimer = new InactivityTimer(this);
         cameraView = findViewById(R.id.camera);
         test = findViewById(R.id.test);
         cover = findViewById(R.id.cover);
         addr = findViewById(R.id.addr);
-        cover.post(new Runnable() {
+        cover.postDelayed(new Runnable() {
             @Override
             public void run() {
                 Bitmap bitmap = Bitmap.createBitmap(cover.getMeasuredWidth(), cover.getMeasuredHeight(), ARGB_8888);
@@ -66,129 +77,199 @@ public class ScanQRActivity extends AppCompatActivity {
                 paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
                 paint.setFlags(Paint.ANTI_ALIAS_FLAG);
                 paint.setColor(Color.TRANSPARENT);
-                codeRect = new Rect(cover.getMeasuredWidth() / 2 - 320, cover.getMeasuredHeight() / 2 - 320 - 150, cover.getMeasuredWidth() / 2 + 320, cover.getMeasuredHeight() / 2 + 320 - 150);
-                canvas.drawRect(codeRect, paint);
+                canvas.drawRect(CameraManager.get().getFramingRect(), paint);
                 cover.setImageBitmap(bitmap);
             }
+        }, 0);
+        findViewById(R.id.go).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(v.getContext(), addr.getText().toString(), Toast.LENGTH_SHORT).show();
+                String str = addr.getText().toString();
+                if (TextUtils.isEmpty(str)) {
+                    return;
+                }
+
+                final String finalParameter = parseResult();
+//                ThreadExecutor.postThreadPool(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            MRNUtils.jumpByUrl(ScanQRActivity.this, finalParameter, null);
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                            UiThreadUtil.runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Toast.makeText(ScanQRActivity.this, "网络错误，请确定在同一网段", Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+//                        } catch (Throwable e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
+            }
         });
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            needResult = intent.getIntExtra("needResult", 0);
+        }
     }
 
-    Runnable work = new Runnable() {
-        @Override
-        public void run() {
-            if (cameraView != null && hasResume) {
-                cameraView.takePicture();
-            }
-            ThreadExecutor.postMain(work, 500);
+    private String parseResult() {
+        String str = addr.getText().toString();
+        if (TextUtils.isEmpty(str)) {
+            return str;
         }
-    };
+        String parameter = str;
+        if (str.startsWith("http")) {
+            Uri uri = Uri.parse(str);
+            parameter = uri.getQueryParameter("h");
+        }
+        return parameter;
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent != null) {
+            needResult = intent.getIntExtra("needResult", 0);
+        }
+    }
+
 
     @Override
     protected void onResume() {
         super.onResume();
-        hasResume = true;
-        cameraView.start();
-        cameraView.addCallback(new CameraView.Callback() {
-            @Override
-            public void onPictureTaken(CameraView cameraView, final byte[] data) {
-                super.onPictureTaken(cameraView, data);
-                try {
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    int width = bitmap.getHeight();
-                    int height = bitmap.getWidth();
-                    float bi = (float) cover.getHeight() / cover.getWidth();
-                    float sc = (float) cover.getWidth() / width;
-                    int w, h;
-                    if (sc * height > cover.getHeight()) {
-                        w = width;
-                        h = (int) (width * bi);
-                    } else {
-                        w = (int) (height / bi);
-                        h = height;
-                    }
-                    Matrix matrix = new Matrix();
-                    matrix.postRotate(90);
-                    float scaleWidth = ((float) codeRect.width() / 2) / ((float) codeRect.width() / cover.getWidth() * w);
-                    matrix.postScale(scaleWidth, scaleWidth);
-
-                    bitmap = Bitmap.createBitmap(bitmap,
-                            (int) (((float) codeRect.top / cover.getHeight()) * h),
-                            (int) (width - (((float) (codeRect.left + codeRect.width()) / cover.getWidth()) * w)),
-                            (int) ((float) codeRect.width() / cover.getWidth() * w),
-                            (int) ((float) codeRect.height() / cover.getHeight() * h)
-                            , matrix, true);
-
-                    final Bitmap finalBitmap = bitmap;
-                    ThreadExecutor.postMain(new Runnable() {
-                        @Override
-                        public void run() {
-                            test.setImageBitmap(finalBitmap);
-                        }
-                    });
-
-                    MultiFormatReader multiFormatReader = new MultiFormatReader();
-
-                    int[] pixels = new int[bitmap.getWidth() * bitmap.getHeight()];
-                    bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-                    LuminanceSource source = new RGBLuminanceSource(bitmap.getWidth(), bitmap.getHeight(), pixels);
-                    Binarizer binarizer = new HybridBinarizer(source);
-                    BinaryBitmap binaryBitmap = new BinaryBitmap(binarizer);
-
-                    Map hints = new HashMap();
-                    hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
-
-                    Result result = multiFormatReader.decode(binaryBitmap, hints);
-
-                    ThreadExecutor.postMain(new Runnable() {
-                        @Override
-                        public void run() {
-                            addr.setText(result.getText());
-                        }
-                    });
-
-                } catch (NotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        ThreadExecutor.postMain(work, 700);
-
+        SurfaceHolder surfaceHolder = cameraView.getHolder();
+        if (hasSurface) {
+            initCamera(surfaceHolder);
+        } else {
+            surfaceHolder.addCallback(this);
+            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        }
+        decodeFormats = null;
+        characterSet = null;
+        vibrate = true;
     }
-
 
     @Override
     protected void onPause() {
         super.onPause();
-        hasResume = false;
-        ThreadExecutor.removeCallbacksMain(work);
-        cameraView.stop();
-
+        if (handler != null) {
+            handler.quitSynchronously();
+            handler = null;
+        }
+        CameraManager.get().closeDriver();
     }
 
+    @Override
+    protected void onDestroy() {
+        inactivityTimer.shutdown();
+        super.onDestroy();
+    }
 
-    protected void initActionBar(String title) {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setCustomView(R.layout.actionbar);//设置自定义的布局：actionbar_custom
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM); //Enable自定义的View
-            actionBar.setDisplayShowCustomEnabled(true);
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowTitleEnabled(false);
+    /**
+     * Handler scan result
+     *
+     * @param result
+     * @param barcode
+     */
+    public void handleDecode(Result result, Bitmap barcode) {
+        inactivityTimer.onActivity();
+        playBeepSoundAndVibrate();
+        String resultString = result.getText();
+        //FIXME
+        if (TextUtils.isEmpty(resultString)) {
+            Toast.makeText(ScanQRActivity.this, "Scan failed!", Toast.LENGTH_SHORT).show();
+        } else {
+            addr.setText(resultString);
+            if (needResult == 1) {
+                Intent intent = new Intent();
+                intent.putExtra("result_url", parseResult());
+                setResult(Activity.RESULT_OK, intent);
+                ScanQRActivity.this.finish();
 
-            //title
-            if (!TextUtils.isEmpty(title)) {
-                TextView tv = actionBar.getCustomView().findViewById(R.id.tv_action_bar_title);
-                tv.setText(title);
             }
-            ImageView back = actionBar.getCustomView().findViewById(R.id.back);
-            back.setVisibility(View.VISIBLE);
-            back.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ScanQRActivity.this.finish();
-                }
-            });
+        }
+        test.setImageBitmap(barcode);
+    }
+
+    private void initCamera(SurfaceHolder surfaceHolder) {
+        try {
+            CameraManager.get().openDriver(surfaceHolder, cover);
+        } catch (IOException ioe) {
+            return;
+        } catch (RuntimeException e) {
+            return;
+        }
+        if (handler == null) {
+            handler = new CaptureActivityHandler(this, decodeFormats,
+                    characterSet);
         }
     }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,
+                               int height) {
+
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        if (!hasSurface) {
+            hasSurface = true;
+            initCamera(holder);
+        }
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        hasSurface = false;
+
+    }
+
+    public Handler getHandler() {
+        return handler;
+    }
+
+
+    private static final long VIBRATE_DURATION = 200L;
+
+    private void playBeepSoundAndVibrate() {
+        if (vibrate) {
+            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            vibrator.vibrate(VIBRATE_DURATION);
+        }
+    }
+
+
+//    protected void initActionBar(String title) {
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setCustomView(R.layout.actionbar);//设置自定义的布局：actionbar_custom
+//            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM); //Enable自定义的View
+//            actionBar.setDisplayShowCustomEnabled(true);
+//            actionBar.setDisplayShowHomeEnabled(false);
+//            actionBar.setDisplayShowTitleEnabled(false);
+//
+//            //title
+//            if (!TextUtils.isEmpty(title)) {
+//                TextView tv = actionBar.getCustomView().findViewById(R.id.tv_action_bar_title);
+//                tv.setText(title);
+//            }
+//            ImageView back = actionBar.getCustomView().findViewById(R.id.back);
+//            back.setVisibility(View.VISIBLE);
+//            back.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    ScanQRActivity.this.finish();
+//                }
+//            });
+//        }
+//    }
 }
