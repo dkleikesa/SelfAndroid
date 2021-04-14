@@ -25,17 +25,17 @@ public class PrintClassNameProcess extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         Messager messager = processingEnv.getMessager();
 
-        messager.printMessage(Diagnostic.Kind.NOTE, "Printing:~~~~~~~~~~~~~~~~START");
+        messager.printMessage(Diagnostic.Kind.ERROR, "Printing:~~~~~~~~~~~~~~~~START");
         for (TypeElement te : set) {
             for (Element e : roundEnvironment.getElementsAnnotatedWith(te)) {
-                messager.printMessage(Diagnostic.Kind.NOTE, "String: " + e.toString());
-                messager.printMessage(Diagnostic.Kind.NOTE, "getKind: " + e.getKind().toString());
-                messager.printMessage(Diagnostic.Kind.NOTE, "value: " + e.getAnnotation(ClassPrint.class).value());
+                messager.printMessage(Diagnostic.Kind.ERROR, "String: " + e.toString());
+                messager.printMessage(Diagnostic.Kind.ERROR, "getKind: " + e.getKind().toString());
+                messager.printMessage(Diagnostic.Kind.ERROR, "value: " + e.getAnnotation(ClassPrint.class).value());
 
             }
         }
 
-        messager.printMessage(Diagnostic.Kind.NOTE, "Printing:~~~~~~~~~~~~~~~~FINISH");
+        messager.printMessage(Diagnostic.Kind.ERROR, "Printing:~~~~~~~~~~~~~~~~FINISH");
         return true;
     }
 }

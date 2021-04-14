@@ -1,21 +1,21 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "autonavi.jnitest"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-//        externalNativeBuild {
-//            cmake {
-//                abiFilters 'armeabi-v7a'
-//            }
-//        }
+        externalNativeBuild {
+            cmake {
+                abiFilters 'armeabi-v7a'
+            }
+        }
     }
     buildTypes {
         release {
@@ -23,11 +23,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-//    externalNativeBuild {
-//        cmake {
-//            path "CMakeLists.txt"
-//        }
-//    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
     lintOptions {
         abortOnError false
     }
@@ -43,10 +43,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:26.+'
-    compile files('../annotations/build/libs/annotations.jar')
-    provided files('../processors/build/libs/processors.jar')
-//    compile files('../testjars/build/libs/testjars.jar')
-    testCompile 'junit:junit:4.12'
+    compile (name: 'cameraView', ext: 'aar')
 }
 
 sourceCompatibility = "1.7"

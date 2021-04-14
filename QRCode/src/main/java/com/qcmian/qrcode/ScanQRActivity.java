@@ -1,5 +1,4 @@
-package com.meituan.android.mrnmap.test;
-
+package com.qcmian.qrcode
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,7 +31,7 @@ import com.google.zxing.PlanarYUVLuminanceSource;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
-import com.meituan.android.mrnmap.test.utils.ThreadExecutor;
+import com.qcmian.qrcode.R;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class ScanQRActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan_qrcode);
+        setContentView(R.layout.activity_main);
         initActionBar("扫码链接");
         cameraView = findViewById(R.id.camera);
         test = findViewById(R.id.test);

@@ -3,7 +3,6 @@ package com.ljz.qcmian.map;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -11,13 +10,9 @@ import android.view.View;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.MapView;
-import com.amap.api.maps.Projection;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Tile;
 import com.amap.api.maps.model.TileOverlay;
 import com.amap.api.maps.model.TileOverlayOptions;
-import com.amap.api.maps.model.TileProjection;
 import com.amap.api.maps.model.TileProvider;
 import com.ljz.qcmian.R;
 

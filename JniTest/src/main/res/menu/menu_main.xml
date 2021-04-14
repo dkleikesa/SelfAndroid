@@ -1,14 +1,32 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="autonavi.jnitest.MainActivity" >
-    <item android:id="@+id/action_main2activity"
-        android:title="@string/title_activity_main2"
+    tools:context="autonavi.jnitest.MainActivity">
+    <item
+        android:id="@+id/action_main2activity"
         android:orderInCategory="100"
+        android:title="@string/title_activity_main2"
         app:showAsAction="never" />
 
-    <item android:id="@+id/action_surfaceview"
-        android:title="@string/title_surfaceview"
+    <item
+        android:id="@+id/action_surfaceview"
         android:orderInCategory="100"
+        android:title="@string/title_surfaceview"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_glsurfaceview"
+        android:orderInCategory="100"
+        android:title="GLSurfaceViewActivity"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_soundgenerate"
+        android:orderInCategory="100"
+        android:title="SoundGenerateActivity"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_enerty"
+        android:orderInCategory="100"
+        android:title="EnertyActivity"
         app:showAsAction="never" />
 </menu>

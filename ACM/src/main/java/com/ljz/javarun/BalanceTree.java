@@ -23,15 +23,9 @@ public class BalanceTree {
         root.left.left = new TreeNode(4);
         root.left.right = new TreeNode(5);
         root.left.right.left = new TreeNode(7);
-        boolean ret = IsBalanced(root);
+        boolean ret = isBalanced(root);
         System.out.println("ban:" + ret);
     }
-
-
-    public static boolean IsBalanced(TreeNode root) {
-        return getDepthWithBalance(root) != -1;
-    }
-
 
     public static class TreeNode {
         int val;
@@ -76,42 +70,43 @@ public class BalanceTree {
         return dep;
     }
 
-    //    private static int getDepthWithBalance(TreeNode root) {
-//        if (root == null) return 0;
-//        int left = getDepth(root.left);
-//        if (left == -1) return -1;
-//        int right = getDepth(root.right);
-//        if (right == -1) return -1;
-//        return Math.abs(left - right) > 1 ? -1 : 1 + Math.max(left, right);
-//    }
+    static boolean isBalanced1(TreeNode root) {
+        if (root == null)
+            return true;
+        return getDepth1(root) != -1;
+    }
 
-    private static int getDepthWithBalance(TreeNode root) {
+    //深度优先遍历
+    private static int getDepth1(TreeNode root) {
         if (root == null) {
             return 0;
         }
-
-        int lnum = 0;
-        int rnum = 0;
-        if (root.left != null) {
-            lnum = getDepth(root.left);
-        }
+        // 如果已经不平衡，直接返回null即可
+        int lnum = getDepth1(root.left);
         if (lnum == -1) {
             return -1;
         }
 
-        if (root.right != null) {
-            rnum = getDepth(root.right);
-        }
+        int rnum = getDepth1(root.right);
         if (rnum == -1) {
             return -1;
         }
-
-        if (Math.abs(lnum - rnum) > 1) {
-            return -1;
-        } else {
-            return Math.max(lnum, rnum) + 1;
-        }
+        // 判断当前节点如果平衡则返回树高度， 否则返回-1，表示不平衡
+        return Math.abs(lnum - rnum) > 1 ? -1 : Math.max(lnum, rnum) + 1;
     }
+
+
+    static boolean isBalanced(TreeNode root) {
+        if (root == null)
+            return true;
+        int left = getDepth(root.left);
+        int right = getDepth(root.right);
+        int diff = left - right;
+        if (diff > 1 || diff < -1)
+            return false;
+        return isBalanced(root.left) && isBalanced(root.right);
+    }
+
 
     //深度优先遍历
     private static int getDepth(TreeNode root) {

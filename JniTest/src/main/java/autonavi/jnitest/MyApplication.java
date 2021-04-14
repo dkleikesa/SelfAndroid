@@ -21,17 +21,24 @@ public class MyApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         try {
-//            appClassLoader = MyApplication.class.getClassLoader();
-//            parentClassLoader = appClassLoader.getParent();
-//            File dexPath = new File("/sdcard/app-debug.apk");
-//            File tmpPath = new File(this.getFilesDir().getAbsolutePath(), "/testDexTmp/");
-////        Toast.makeText(this, dexPath.getAbsolutePath() + "\n exist:" + dexPath.exists(), Toast.LENGTH_SHORT).show();
-//            dexClassLoader = new DexClassLoader(dexPath.getAbsolutePath(), tmpPath.getAbsolutePath(), null, parentClassLoader);
+            Log.e("lllLLL:","aaa");
 //
-////            Class<Test> aClass = (Class<Test>) dexClassLoader.loadClass("autonavi.jnitest.Test");
-////            Test ins = aClass.newInstance();
-////            Toast.makeText(this, ins.TTT, Toast.LENGTH_SHORT).show();
+            appClassLoader = MyApplication.class.getClassLoader();
+            parentClassLoader = appClassLoader.getParent();
+            File dexPath = new File("/sdcard/app-debug.apk");
+            File tmpPath = new File(this.getFilesDir().getAbsolutePath(), "/testDexTmp/");
+            dexClassLoader = new DexClassLoader(dexPath.getAbsolutePath(), tmpPath.getAbsolutePath(), tmpPath.getAbsolutePath(), parentClassLoader);
+
+//            Class<Test> aClass = (Class<Test>) dexClassLoader.loadClass("autonavi.jnitest.Test");
+//            Test ins = aClass.newInstance();
+//            Toast.makeText(this, "abc" + ins.TTT, Toast.LENGTH_SHORT).show();
+//
+//            Log.e("lllLLL:","dddd");
+//            Log.e("lllLLL:","abc" + ins.TTT);
 //            setClassLoadProxy(appClassLoader, dexClassLoader);
+
+            Toast.makeText(this, "dc" + new Test().TTT, Toast.LENGTH_SHORT).show();
+            Log.e("lllLLL:","dc" + new Test().TTT);
         } catch (Exception e) {
             e.printStackTrace();
         }

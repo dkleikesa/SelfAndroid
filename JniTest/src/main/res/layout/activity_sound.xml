@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ff0"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_generate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="发送" />
+
+    <Button
+        android:id="@+id/btn_receive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/btn_generate"
+        android:text="接收" />
+
+    <SurfaceView
+        android:id="@+id/surfaceview"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@+id/btn_generate" />
+
+    <SurfaceView
+        android:id="@+id/surfaceview1"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_below="@+id/surfaceview"
+        android:layout_marginTop="10dp" />
+
+</RelativeLayout>

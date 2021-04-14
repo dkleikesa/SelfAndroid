@@ -2,7 +2,7 @@ apply plugin: 'java'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile files('../annotations/build/libs/annotations.jar')
+    compile files('../annotation-annotations/build/libs/annotation-annotations.jar')
 }
 jar {
     manifest {

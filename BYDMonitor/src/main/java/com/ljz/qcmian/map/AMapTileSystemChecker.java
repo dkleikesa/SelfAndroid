@@ -10,7 +10,6 @@ import android.view.View;
 
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.CoordinateConverter;
 import com.amap.api.maps.Projection;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;

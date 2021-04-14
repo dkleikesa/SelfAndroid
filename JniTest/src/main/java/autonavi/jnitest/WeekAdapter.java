@@ -2,6 +2,7 @@ package autonavi.jnitest;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +21,12 @@ public class WeekAdapter extends ArrayAdapter {
         resourceId = resource;
     }
 
+    static int idx = 0;
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        idx++;
+        Log.e("WeekAdapter", "getView:" + idx);
         Main3Activity.Week fruit = (Main3Activity.Week) getItem(position); // 获取当前项的Fruit实例
         View view = LayoutInflater.from(getContext()).inflate(resourceId, null);//实例化一个对象
         ImageView fruitImage = (ImageView) view.findViewById(R.id.fruit_image);//获取该布局内的图片视图

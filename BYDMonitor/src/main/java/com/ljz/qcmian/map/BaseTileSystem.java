@@ -14,7 +14,6 @@ public class BaseTileSystem {
     private static final double MIN_LONGITUDE = -180; //墨卡托投影的极值
     private static final double MAX_LONGITUDE = 180;//墨卡托投影的极值
 
-
     protected long defaultMapSize = 256;
 
     /**

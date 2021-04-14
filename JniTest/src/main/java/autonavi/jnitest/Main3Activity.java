@@ -56,10 +56,10 @@ public class Main3Activity extends Activity {
         List arr = new ArrayList();
         String[] weeks = {"星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期天"};
         int[] res = {R.drawable.week1, R.drawable.week2, R.drawable.week3, R.drawable.week4, R.drawable.week5, R.drawable.week6, R.drawable.week7};
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 10000; i++) {
             Week w = new Week();
-            w.name = weeks[i];
-            w.id = res[i];
+            w.name = weeks[i % 7];
+            w.id = res[i % 7];
             arr.add(w);
         }
         return arr;
