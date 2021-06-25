@@ -1,3 +1,4 @@
 include ':happycolor', ':BYDMonitor', ':weixincachecleaner',':QRCode'
 include  ':annotation-annotations', ':annotation-processors',  'testjars',':JniTest', ':ACM'
 include ':plugindemo'
+include ':accessibility'
